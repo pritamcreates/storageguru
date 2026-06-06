@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Storage Guru — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#f4f3ef;--white:#fff;--dark:#0f0f0f;
+    --accent:#e8521a;--accent2:#f0a500;
+    --gray:#888;--border:#e5e3de;
+    --hdd:#4a9edd;--ssd:#2ec4a9;
+    --danger:#e8521a;--warn:#f0a500;--safe:#2ec4a9;
+    --sidebar-w:248px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--dark);display:flex;height:100vh;overflow:hidden;}
+
+  /* SIDEBAR */
+  .sidebar{width:var(--sidebar-w);background:var(--dark);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+  .sidebar-header{padding:24px 20px 20px;border-bottom:1px solid #1e1e1e;}
+  .logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+  .logo-icon{width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .logo-text{font-weight:800;font-size:16px;color:#fff;}
+  .user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1a1a1a;border-radius:10px;}
+  .user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;}
+  .user-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+  .user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .user-email{font-size:11px;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  .sidebar-nav{padding:16px 12px;flex:1;}
+  .nav-label{font-size:10px;letter-spacing:1px;color:#444;text-transform:uppercase;padding:0 8px;margin:16px 0 8px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:background .15s,color .15s;color:#666;font-size:13px;font-weight:500;margin-bottom:2px;text-decoration:none;border:none;background:none;width:100%;font-family:'Montserrat',sans-serif;}
+  .nav-item:hover{background:#1a1a1a;color:#aaa;}
+  .nav-item.active{background:var(--accent);color:#fff;}
+  .nav-item svg{flex-shrink:0;}
+
+  .sidebar-footer{padding:16px 12px;border-top:1px solid #1a1a1a;}
+  .storage-summary{padding:12px;background:#161616;border-radius:10px;margin-bottom:12px;}
+  .storage-row{display:flex;justify-content:space-between;font-size:11px;color:#555;margin-bottom:6px;}
+  .storage-bar-bg{height:4px;background:#2a2a2a;border-radius:2px;overflow:hidden;margin-bottom:6px;}
+  .storage-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--ssd),var(--accent2));transition:width .6s ease;}
+  .btn-signout{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;cursor:pointer;color:#444;font-size:13px;transition:color .2s;background:none;border:none;font-family:'Montserrat',sans-serif;width:100%;}
+  .btn-signout:hover{color:var(--accent);}
+
+  /* MAIN */
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;gap:12px;}
+  .search-box{display:flex;align-items:center;gap:10px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 16px;width:300px;transition:border-color .2s;}
+  .search-box:focus-within{border-color:var(--accent);}
+  .search-box input{background:none;border:none;outline:none;font-family:'Montserrat',sans-serif;font-size:13px;color:var(--dark);width:100%;}
+  .search-box input::placeholder{color:#bbb;}
+  .topbar-right{display:flex;align-items:center;gap:10px;}
+  .badge-cleanup{display:flex;align-items:center;gap:8px;padding:9px 15px;background:rgba(240,165,0,.12);border:1.5px solid rgba(240,165,0,.3);border-radius:10px;font-size:12px;font-weight:600;color:#c28800;cursor:pointer;transition:background .2s;}
+  .badge-cleanup:hover{background:rgba(240,165,0,.2);}
+  .btn-add{display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--dark);color:#fff;border:none;border-radius:10px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s,transform .1s;}
+  .btn-add:hover{background:#1e1e1e;transform:translateY(-1px);}
+  .blink{width:6px;height:6px;border-radius:50%;background:var(--accent2);animation:blink 1.5s ease-in-out infinite;flex-shrink:0;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+  /* CONTENT */
+  .content{flex:1;overflow-y:auto;padding:24px 28px;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+  .welcome-strip{margin-bottom:20px;animation:fadeUp .4s ease both;}
+  .welcome-strip h1{font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:3px;}
+  .welcome-strip p{font-size:13px;color:var(--gray);}
+
+  .streak-banner{background:var(--dark);border-radius:14px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;animation:fadeUp .4s ease .05s both;position:relative;overflow:hidden;}
+  .streak-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(240,165,0,.15),transparent 60%);pointer-events:none;}
+  .streak-left{display:flex;align-items:center;gap:14px;z-index:1;}
+  .streak-fire{font-size:28px;}
+  .streak-text h3{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;}
+  .streak-text p{font-size:11px;color:#555;}
+  .streak-num{font-size:40px;font-weight:800;color:var(--accent2);z-index:1;line-height:1;}
+
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;animation:fadeUp .4s ease .1s both;}
+  .stat-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;position:relative;overflow:hidden;}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;}
+  .stat-card.c-hdd::before{background:var(--hdd);}
+  .stat-card.c-ssd::before{background:var(--ssd);}
+  .stat-card.c-danger::before{background:var(--danger);}
+  .stat-card.c-freed::before{background:var(--accent2);}
+  .stat-label{font-size:10px;letter-spacing:.5px;color:var(--gray);text-transform:uppercase;margin-bottom:8px;font-weight:600;}
+  .stat-value{font-size:30px;font-weight:800;line-height:1;margin-bottom:4px;}
+  .stat-sub{font-size:11px;color:var(--gray);}
+
+  .main-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;animation:fadeUp .4s ease .15s both;}
+
+  /* DRIVES */
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .section-title{font-size:15px;font-weight:700;}
+  .filter-tabs{display:flex;gap:6px;}
+  .filter-tab{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--gray);transition:all .15s;font-family:'Montserrat',sans-serif;}
+  .filter-tab.active{background:var(--dark);color:#fff;border-color:var(--dark);}
+  .filter-tab:hover:not(.active){border-color:#bbb;color:var(--dark);}
+
+  .drives-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px;margin-bottom:20px;}
+  .drive-card{background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;position:relative;}
+  .drive-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08);border-color:#ccc;}
+  .drive-card.is-danger{border-color:rgba(232,82,26,.3);background:#fff9f7;}
+  .drive-card.is-today{border-color:rgba(240,165,0,.4);background:#fffdf5;}
+  .drive-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .badge{font-size:9px;font-weight:700;letter-spacing:.5px;padding:3px 7px;border-radius:4px;text-transform:uppercase;}
+  .badge-hdd{background:rgba(74,158,221,.12);color:var(--hdd);}
+  .badge-ssd{background:rgba(46,196,169,.12);color:var(--ssd);}
+  .badge-today{background:rgba(240,165,0,.15);color:#c28800;}
+  .drive-menu{background:none;border:none;cursor:pointer;color:#ccc;font-size:18px;padding:0 2px;border-radius:4px;transition:color .15s;line-height:1;}
+  .drive-menu:hover{color:var(--gray);}
+  .drive-icon-wrap{display:flex;justify-content:center;margin-bottom:10px;}
+  .drive-name{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .drive-loc{font-size:11px;color:var(--gray);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fill-bar-bg{height:5px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:4px;}
+  .fill-bar{height:100%;border-radius:3px;transition:width .8s ease;}
+  .fill-safe{background:var(--safe);}
+  .fill-warn{background:var(--warn);}
+  .fill-danger{background:linear-gradient(90deg,var(--warn),var(--danger));}
+  .fill-nums{display:flex;justify-content:space-between;font-size:10px;color:var(--gray);}
+  .fill-pct{font-weight:700;}
+  .pct-danger{color:var(--danger);}
+  .pct-warn{color:var(--warn);}
+  .empty-state{grid-column:1/-1;text-align:center;padding:48px;color:var(--gray);}
+  .empty-state .big-icon{font-size:40px;margin-bottom:12px;}
+  .empty-state strong{display:block;margin-bottom:6px;color:var(--dark);}
+
+  /* RIGHT PANEL */
+  .right-col{display:flex;flex-direction:column;gap:16px;}
+
+  .today-card{background:var(--dark);border-radius:14px;padding:20px;position:relative;overflow:hidden;}
+  .today-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(240,165,0,.2),transparent 60%);pointer-events:none;}
+  .today-tag{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:1px;color:#555;text-transform:uppercase;font-weight:600;margin-bottom:12px;z-index:1;position:relative;}
+  .today-drive-name{font-size:17px;font-weight:800;color:#fff;margin-bottom:3px;position:relative;z-index:1;}
+  .today-drive-meta{font-size:11px;color:#555;margin-bottom:14px;position:relative;z-index:1;}
+  .today-prog-row{display:flex;justify-content:space-between;font-size:11px;color:#555;margin-bottom:5px;position:relative;z-index:1;}
+  .today-prog-bar{height:6px;background:#222;border-radius:3px;overflow:hidden;margin-bottom:14px;position:relative;z-index:1;}
+  .today-prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .6s ease;}
+  .today-actions{display:flex;gap:8px;position:relative;z-index:1;}
+  .btn-today{flex:1;padding:10px;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;cursor:pointer;border:none;transition:all .2s;}
+  .btn-today.primary{background:var(--accent2);color:var(--dark);}
+  .btn-today.primary:hover{background:#e09800;}
+  .btn-today.secondary{background:#1a1a1a;color:#555;border:1px solid #222;}
+  .btn-today.secondary:hover{color:#aaa;}
+
+  .cleanup-log-box{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;}
+  .log-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .log-header-title{font-size:14px;font-weight:700;}
+  .log-count{font-size:11px;color:var(--gray);}
+  .log-entry{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--bg);}
+  .log-entry:last-child{border-bottom:none;padding-bottom:0;}
+  .log-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;}
+  .log-icon.freed{background:rgba(46,196,169,.1);}
+  .log-icon.moved{background:rgba(74,158,221,.1);}
+  .log-icon.organized{background:rgba(240,165,0,.1);}
+  .log-body{flex:1;min-width:0;}
+  .log-drive{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .log-detail{font-size:11px;color:var(--gray);margin-top:2px;}
+  .log-date{font-size:10px;color:var(--gray);white-space:nowrap;flex-shrink:0;}
+  .log-empty{text-align:center;padding:20px;color:var(--gray);font-size:12px;}
+
+  .folders-box{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;}
+  .folder-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px;}
+  .folder-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:10px;cursor:pointer;transition:background .15s;border:1.5px solid transparent;}
+  .folder-item:hover{background:#eeecea;border-color:#ddd;}
+  .folder-item.active-filter{border-color:var(--accent);background:#fff5f2;}
+  .folder-ico{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .folder-name{font-size:11px;font-weight:700;}
+  .folder-sub{font-size:10px;color:var(--gray);}
+
+  /* DETAIL MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .modal{background:#fff;border-radius:18px;padding:28px;width:480px;max-width:92vw;box-shadow:0 20px 60px rgba(0,0,0,.2);transform:translateY(12px);transition:transform .2s;max-height:90vh;overflow-y:auto;}
+  .modal-overlay.open .modal{transform:translateY(0);}
+  .modal-title{font-size:20px;font-weight:800;margin-bottom:5px;}
+  .modal-sub{font-size:13px;color:var(--gray);margin-bottom:22px;}
+  .modal-field{margin-bottom:15px;}
+  .modal-field label{display:block;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
+  .modal-field input,.modal-field select,.modal-field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:13px;color:var(--dark);background:var(--bg);outline:none;transition:border-color .2s;}
+  .modal-field input:focus,.modal-field select:focus,.modal-field textarea:focus{border-color:var(--accent);background:#fff;}
+  .modal-field textarea{resize:vertical;min-height:72px;}
+  .modal-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .modal-actions{display:flex;gap:10px;margin-top:22px;}
+  .btn-primary{flex:1;padding:13px;background:var(--dark);color:#fff;border:none;border-radius:10px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .2s;}
+  .btn-primary:hover{background:#1e1e1e;}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-cancel{padding:13px 18px;background:var(--bg);color:var(--gray);border:1.5px solid var(--border);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;}
+  .btn-cancel:hover{border-color:#bbb;color:var(--dark);}
+
+  /* DETAIL PANEL inside modal */
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+  .detail-item{background:var(--bg);border-radius:10px;padding:12px;}
+  .detail-item-label{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);margin-bottom:4px;}
+  .detail-item-value{font-size:15px;font-weight:700;}
+  .detail-fill-bar{height:8px;background:#e5e3de;border-radius:4px;overflow:hidden;margin-top:6px;}
+  .detail-fill{height:100%;border-radius:4px;}
+
+  .toast{position:fixed;bottom:28px;right:28px;background:var(--dark);color:#fff;padding:14px 20px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:999;transform:translateY(20px);opacity:0;transition:all .3s;pointer-events:none;}
+  .toast.show{transform:translateY(0);opacity:1;}
+
+  @media(max-width:1100px){.main-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo-mark">
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="6" width="18" height="5" rx="1.5" fill="white" opacity=".9"/>
+          <circle cx="18" cy="8.5" r="1.2" fill="#0f0f0f"/>
+          <rect x="3" y="13" width="18" height="5" rx="1.5" fill="white" opacity=".6"/>
+          <circle cx="18" cy="15.5" r="1.2" fill="#0f0f0f"/>
+        </svg>
+      </div>
+      <span class="logo-text">Storage Guru</span>
+    </div>
+    <div class="user-card">
+      <div class="user-avatar" id="userAvatar">SG</div>
+      <div>
+        <div class="user-name" id="userName">Loading...</div>
+        <div class="user-email" id="userEmail">...</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <button class="nav-item active" data-view="all" onclick="setView(this,'all')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" data-view="danger" onclick="setView(this,'danger')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 19h20L12 2z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>
+      Danger Zone
+    </button>
+    <button class="nav-item" data-view="cleanup" onclick="setView(this,'cleanup')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+      Cleanup Log
+    </button>
+
+    <div class="nav-label">Folders</div>
+    <button class="nav-item" data-folder="_ACTIVE" onclick="setFolder(this,'_ACTIVE')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4a9edd" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+      _ACTIVE
+    </button>
+    <button class="nav-item" data-folder="_ARCHIVE" onclick="setFolder(this,'_ARCHIVE')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2ec4a9" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V7z"/></svg>
+      _ARCHIVE
+    </button>
+    <button class="nav-item" data-folder="_INBOX" onclick="setFolder(this,'_INBOX')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f0a500" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V7z"/></svg>
+      _INBOX
+    </button>
+    <button class="nav-item" data-folder="_PERSONAL" onclick="setFolder(this,'_PERSONAL')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8521a" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V7z"/></svg>
+      _PERSONAL
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="storage-summary">
+      <div class="storage-row"><span>Total storage</span><span id="sidebarCap">—</span></div>
+      <div class="storage-bar-bg"><div class="storage-bar-fill" id="sidebarBar" style="width:0%"></div></div>
+      <div class="storage-row"><span id="sidebarUsed">—</span><span id="sidebarFree">—</span></div>
+    </div>
+    <button class="btn-signout" onclick="doSignOut()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign out
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="search-box">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Search drives by name or location..." oninput="onSearch(this.value)"/>
+    </div>
+    <div class="topbar-right">
+      <div class="badge-cleanup" onclick="openLogModal()">
+        <div class="blink"></div>
+        Log today's cleanup
+      </div>
+      <button class="btn-add" onclick="openAddModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Drive
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="welcome-strip">
+      <h1 id="welcomeH1">Welcome back 👋</h1>
+      <p id="welcomeSub">Here's your storage command center.</p>
+    </div>
+
+    <div class="streak-banner">
+      <div class="streak-left">
+        <div class="streak-fire">🔥</div>
+        <div class="streak-text">
+          <h3>Cleanup Streak</h3>
+          <p>One drive a day keeps the chaos away</p>
+        </div>
+      </div>
+      <div class="streak-num" id="streakNum">0</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card c-hdd"><div class="stat-label">HDD Drives</div><div class="stat-value" id="stHDD">0</div><div class="stat-sub">registered</div></div>
+      <div class="stat-card c-ssd"><div class="stat-label">SSD Drives</div><div class="stat-value" id="stSSD">0</div><div class="stat-sub">registered</div></div>
+      <div class="stat-card c-danger"><div class="stat-label">Danger Drives</div><div class="stat-value" id="stDanger">0</div><div class="stat-sub">above 85% full</div></div>
+      <div class="stat-card c-freed"><div class="stat-label">GB Freed</div><div class="stat-value" id="stFreed">0</div><div class="stat-sub">total logged</div></div>
+    </div>
+
+    <div class="main-grid">
+      <!-- LEFT -->
+      <div>
+        <div class="section-header">
+          <div class="section-title" id="drivesTitle">Drive Registry</div>
+          <div class="filter-tabs" id="filterTabs">
+            <button class="filter-tab active" onclick="setTypeFilter('all',this)">All</button>
+            <button class="filter-tab" onclick="setTypeFilter('HDD',this)">HDD</button>
+            <button class="filter-tab" onclick="setTypeFilter('SSD',this)">SSD</button>
+            <button class="filter-tab" onclick="setTypeFilter('danger',this)">⚠️ Full</button>
+          </div>
+        </div>
+        <div class="drives-grid" id="drivesGrid">
+          <div class="empty-state"><div class="big-icon">💽</div><strong>Loading drives...</strong></div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="right-col">
+        <div class="today-card">
+          <div class="today-tag"><div class="blink"></div> Today's Drive</div>
+          <div class="today-drive-name" id="todayName">No drive assigned</div>
+          <div class="today-drive-meta" id="todayMeta">Click ⋯ on any drive card to assign it</div>
+          <div class="today-prog-row"><span>Storage usage</span><span id="todayPct">—</span></div>
+          <div class="today-prog-bar"><div class="today-prog-fill" id="todayFill" style="width:0%"></div></div>
+          <div class="today-actions">
+            <button class="btn-today primary" onclick="markTodayDone()">✓ Mark Complete</button>
+            <button class="btn-today secondary" onclick="openLogModal()">+ Log Entry</button>
+          </div>
+        </div>
+
+        <div class="cleanup-log-box">
+          <div class="log-header">
+            <span class="log-header-title">Recent Cleanups</span>
+            <span class="log-count" id="logCount">0 entries</span>
+          </div>
+          <div id="logList"><div class="log-empty">No logs yet — start cleaning!</div></div>
+        </div>
+
+        <div class="folders-box">
+          <div class="section-title">Folder System</div>
+          <div class="folder-grid">
+            <div class="folder-item" id="fi-_ACTIVE" onclick="setFolder(null,'_ACTIVE')">
+              <div class="folder-ico" style="background:rgba(74,158,221,.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4a9edd" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></div>
+              <div><div class="folder-name">_ACTIVE</div><div class="folder-sub">Current work</div></div>
+            </div>
+            <div class="folder-item" id="fi-_ARCHIVE" onclick="setFolder(null,'_ARCHIVE')">
+              <div class="folder-ico" style="background:rgba(46,196,169,.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2ec4a9" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V7z"/></svg></div>
+              <div><div class="folder-name">_ARCHIVE</div><div class="folder-sub">Long-term</div></div>
+            </div>
+            <div class="folder-item" id="fi-_INBOX" onclick="setFolder(null,'_INBOX')">
+              <div class="folder-ico" style="background:rgba(240,165,0,.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f0a500" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V7z"/></svg></div>
+              <div><div class="folder-name">_INBOX</div><div class="folder-sub">To be sorted</div></div>
+            </div>
+            <div class="folder-item" id="fi-_PERSONAL" onclick="setFolder(null,'_PERSONAL')">
+              <div class="folder-ico" style="background:rgba(232,82,26,.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8521a" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V7z"/></svg></div>
+              <div><div class="folder-name">_PERSONAL</div><div class="folder-sub">Personal files</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ADD DRIVE MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-title">Register New Drive</div>
+    <div class="modal-sub">Add a drive to your storage registry</div>
+    <div class="modal-field"><label>Drive Name / Label</label><input type="text" id="dName" placeholder="e.g. WD_Black_4TB, Office_Footage"/></div>
+    <div class="modal-row">
+      <div class="modal-field"><label>Drive Type</label>
+        <select id="dType"><option value="HDD">HDD (Hard Disk)</option><option value="SSD">SSD (Solid State)</option></select>
+      </div>
+      <div class="modal-field"><label>Total Capacity (GB)</label><input type="number" id="dCap" placeholder="e.g. 2000" min="1"/></div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field"><label>Used Space (GB)</label><input type="number" id="dUsed" placeholder="e.g. 1800" min="0"/></div>
+      <div class="modal-field"><label>Physical Location</label><input type="text" id="dLoc" placeholder="e.g. Box A, Shelf 2"/></div>
+    </div>
+    <div class="modal-field"><label>Primary Folder</label>
+      <select id="dFolder">
+        <option value="_ACTIVE">_ACTIVE — Current work</option>
+        <option value="_ARCHIVE">_ARCHIVE — Long-term storage</option>
+        <option value="_INBOX">_INBOX — To be sorted</option>
+        <option value="_PERSONAL">_PERSONAL — Personal files</option>
+        <option value="Mixed">Mixed / Multiple</option>
+      </select>
+    </div>
+    <div class="modal-field"><label>Notes (optional)</label><input type="text" id="dNotes" placeholder="What's on this drive?"/></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('addModal')">Cancel</button>
+      <button class="btn-primary" id="saveDriveBtn" onclick="saveDrive()">Register Drive</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOG MODAL -->
+<div class="modal-overlay" id="logModal">
+  <div class="modal">
+    <div class="modal-title">Log Cleanup Session</div>
+    <div class="modal-sub">Record what you did today</div>
+    <div class="modal-field"><label>Drive</label><select id="logDrive"></select></div>
+    <div class="modal-row">
+      <div class="modal-field"><label>Space Freed (GB)</label><input type="number" id="logGB" placeholder="e.g. 50" min="0"/></div>
+      <div class="modal-field"><label>Action Type</label>
+        <select id="logAction">
+          <option value="freed">🗑️ Deleted files</option>
+          <option value="moved">📦 Moved to Archive</option>
+          <option value="organized">📁 Organized folders</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-field"><label>Notes</label><textarea id="logNotes" placeholder="What did you clean? Which folders?"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('logModal')">Cancel</button>
+      <button class="btn-primary" id="saveLogBtn" onclick="saveLog()">Save Log Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-title" id="detailTitle">Drive Detail</div>
+    <div class="modal-sub" id="detailSub"></div>
+    <div class="detail-grid" id="detailGrid"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('detailModal')" style="flex:1">Close</button>
+      <button class="btn-primary" id="assignTodayBtn" onclick="assignFromDetail()">Assign for Today</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, addDoc, getDocs, updateDoc,
+  query, where, orderBy, serverTimestamp, limit
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ─────────────────────────────────────────────────────────
+// 🔧 PASTE YOUR FIREBASE CONFIG HERE (same as index.html)
+// ─────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+// ─────────────────────────────────────────────────────────
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ── STATE ──
+let currentUser = null;
+let allDrives = [];
+let allLogs = [];
+let typeFilter = 'all';
+let folderFilter = null;
+let viewMode = 'all'; // all | danger | cleanup
+let searchQ = '';
+let detailDriveId = null;
+
+// ── AUTH ──
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href = 'index.html'; return; }
+  currentUser = user;
+
+  const name = user.displayName || user.email.split('@')[0];
+  document.getElementById('userName').textContent = name;
+  document.getElementById('userEmail').textContent = user.email;
+  document.getElementById('welcomeH1').textContent = `Welcome back, ${name.split(' ')[0]} 👋`;
+  document.getElementById('welcomeSub').textContent = `${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})} · Your storage command center.`;
+
+  // Show Google profile photo if available
+  const avatarEl = document.getElementById('userAvatar');
+  if (user.photoURL) {
+    avatarEl.innerHTML = `<img src="${user.photoURL}" alt="avatar"/>`;
+  } else {
+    avatarEl.textContent = name.charAt(0).toUpperCase();
+  }
+
+  await refreshAll();
+});
+
+async function refreshAll() {
+  await loadDrives();
+  await loadLogs();
+  updateStats();
+  updateSidebar();
+  renderDrives();
+  renderLogs();
+  renderTodayCard();
+}
+
+// ── LOAD ──
+async function loadDrives() {
+  const snap = await getDocs(query(collection(db,'drives'), where('uid','==',currentUser.uid)));
+  allDrives = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  allDrives.sort((a,b) => getPct(b) - getPct(a));
+}
+
+async function loadLogs() {
+  try {
+    const snap = await getDocs(query(
+      collection(db,'cleanupLogs'),
+      where('uid','==',currentUser.uid),
+      orderBy('createdAt','desc')
+    ));
+    allLogs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) {
+    // Composite index not yet created — fall back to unordered fetch + client sort
+    const snap = await getDocs(query(
+      collection(db,'cleanupLogs'),
+      where('uid','==',currentUser.uid)
+    ));
+    allLogs = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .sort((a,b) => {
+        const ta = a.createdAt?.toDate?.()?.getTime() ?? 0;
+        const tb = b.createdAt?.toDate?.()?.getTime() ?? 0;
+        return tb - ta;
+      });
+  }
+}
+
+function getPct(d) {
+  if (d.fillPct !== undefined) return d.fillPct;
+  if (d.capacity > 0) return Math.round((d.used / d.capacity) * 100);
+  return 0;
+}
+
+// ── RENDER DRIVES ──
+function getFilteredDrives() {
+  let list = [...allDrives];
+  if (viewMode === 'danger') list = list.filter(d => getPct(d) >= 85);
+  else if (viewMode === 'cleanup') list = [];
+  if (folderFilter) list = list.filter(d => d.folder === folderFilter);
+  if (typeFilter === 'HDD') list = list.filter(d => d.type === 'HDD');
+  else if (typeFilter === 'SSD') list = list.filter(d => d.type === 'SSD');
+  else if (typeFilter === 'danger') list = list.filter(d => getPct(d) >= 85);
+  if (searchQ) {
+    const q = searchQ.toLowerCase();
+    list = list.filter(d =>
+      d.name.toLowerCase().includes(q) ||
+      (d.location||'').toLowerCase().includes(q) ||
+      (d.folder||'').toLowerCase().includes(q)
+    );
+  }
+  return list;
+}
+
+window.renderDrives = function() {
+  const grid = document.getElementById('drivesGrid');
+  const drives = getFilteredDrives();
+
+  if (viewMode === 'cleanup') {
+    grid.innerHTML = `<div class="empty-state"><div class="big-icon">📋</div><strong>Cleanup Log View</strong><span>See the right panel for all cleanup sessions.</span></div>`;
+    return;
+  }
+
+  if (drives.length === 0) {
+    const msg = allDrives.length === 0
+      ? '<strong>No drives yet</strong><span>Click <b>Add Drive</b> to register your first drive.</span>'
+      : '<strong>No drives match this filter</strong><span>Try clearing the search or changing the filter.</span>';
+    grid.innerHTML = `<div class="empty-state"><div class="big-icon">💽</div>${msg}</div>`;
+    return;
+  }
+
+  const today = new Date().toDateString();
+  grid.innerHTML = drives.map(drive => {
+    const pct = getPct(drive);
+    const fillClass = pct >= 85 ? 'fill-danger' : pct >= 70 ? 'fill-warn' : 'fill-safe';
+    const pctClass = pct >= 85 ? 'pct-danger' : pct >= 70 ? 'pct-warn' : '';
+    const isToday = drive.todayDate === today;
+    const isDanger = pct >= 85;
+    const icon = drive.type === 'SSD' ? ssdSVG() : hddSVG();
+
+    return `<div class="drive-card ${isDanger?'is-danger':''} ${isToday?'is-today':''}" onclick="openDetail('${drive.id}')">
+      <div class="drive-card-top">
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <span class="badge badge-${drive.type.toLowerCase()}">${drive.type}</span>
+          ${isToday ? '<span class="badge badge-today">TODAY</span>' : ''}
+        </div>
+        <button class="drive-menu" title="Assign for today" onclick="event.stopPropagation();assignToday('${drive.id}')">⋯</button>
+      </div>
+      <div class="drive-icon-wrap">${icon}</div>
+      <div class="drive-name" title="${drive.name}">${drive.name}</div>
+      <div class="drive-loc">${drive.location || 'No location set'}</div>
+      <div class="fill-bar-bg"><div class="fill-bar ${fillClass}" style="width:${Math.min(pct,100)}%"></div></div>
+      <div class="fill-nums">
+        <span>${drive.used||0} / ${drive.capacity||0} GB</span>
+        <span class="fill-pct ${pctClass}">${pct}%</span>
+      </div>
+    </div>`;
+  }).join('');
+};
+
+function hddSVG() {
+  return `<svg width="70" height="50" viewBox="0 0 70 50" fill="none" style="filter:drop-shadow(0 4px 10px rgba(74,158,221,.25))">
+    <rect x="2" y="7" width="66" height="36" rx="5" fill="#1e2a3a" stroke="#2d3d50" stroke-width="1.5"/>
+    <rect x="9" y="13" width="36" height="24" rx="3" fill="#243040"/>
+    <circle cx="56" cy="25" r="10" fill="#1a2535" stroke="#2d3d50"/>
+    <circle cx="56" cy="25" r="6" fill="#243040" stroke="#3a5070" stroke-width=".5"/>
+    <circle cx="56" cy="25" r="2.2" fill="#4a9edd"/>
+    <rect x="3" y="37" width="22" height="4" rx="1" fill="#2d3d50"/>
+    <circle cx="64" cy="13" r="2.5" fill="#4a9edd" opacity=".9"/>
+    <rect x="13" y="19" width="18" height="2" rx="1" fill="#2d3d50"/>
+    <rect x="13" y="24" width="13" height="2" rx="1" fill="#2d3d50"/>
+    <rect x="13" y="29" width="16" height="2" rx="1" fill="#2d3d50"/>
+  </svg>`;
+}
+
+function ssdSVG() {
+  return `<svg width="70" height="50" viewBox="0 0 70 50" fill="none" style="filter:drop-shadow(0 4px 10px rgba(46,196,169,.25))">
+    <rect x="2" y="12" width="66" height="26" rx="4" fill="#0d2420" stroke="#1e4a40" stroke-width="1.5"/>
+    <rect x="6" y="15" width="54" height="18" rx="2" fill="#112e28"/>
+    <rect x="9" y="18" width="10" height="7" rx="1.5" fill="#1a4a3a" stroke="#2ec4a940" stroke-width=".5"/>
+    <rect x="22" y="18" width="10" height="7" rx="1.5" fill="#1a4a3a" stroke="#2ec4a940" stroke-width=".5"/>
+    <rect x="35" y="18" width="10" height="7" rx="1.5" fill="#1a4a3a" stroke="#2ec4a940" stroke-width=".5"/>
+    <rect x="9" y="27" width="14" height="4" rx="1" fill="#224a40" stroke="#2ec4a940" stroke-width=".5"/>
+    <rect x="52" y="18" width="6" height="11" rx="1" fill="#1a4a3a"/>
+    <rect x="2" y="33" width="18" height="3" rx="1" fill="#0a1e1a"/>
+    <rect x="22" y="33" width="3" height="3" rx=".5" fill="#2ec4a960"/>
+    <rect x="27" y="33" width="3" height="3" rx=".5" fill="#2ec4a960"/>
+    <rect x="32" y="33" width="3" height="3" rx=".5" fill="#2ec4a960"/>
+    <circle cx="64" cy="14" r="2.5" fill="#2ec4a9" opacity=".9"/>
+  </svg>`;
+}
+
+// ── RENDER TODAY CARD ──
+function renderTodayCard() {
+  const today = new Date().toDateString();
+  const d = allDrives.find(x => x.todayDate === today);
+  if (d) {
+    const pct = getPct(d);
+    document.getElementById('todayName').textContent = d.name;
+    document.getElementById('todayMeta').textContent = `${d.type} · ${d.location||'No location'} · ${d.folder||''}`;
+    document.getElementById('todayPct').textContent = `${pct}%`;
+    document.getElementById('todayFill').style.width = `${Math.min(pct,100)}%`;
+  } else {
+    document.getElementById('todayName').textContent = 'No drive assigned';
+    document.getElementById('todayMeta').textContent = 'Click ⋯ on any drive card to assign it for today';
+    document.getElementById('todayPct').textContent = '—';
+    document.getElementById('todayFill').style.width = '0%';
+  }
+}
+
+// ── RENDER LOGS ──
+function renderLogs() {
+  const list = document.getElementById('logList');
+  const cnt = document.getElementById('logCount');
+  cnt.textContent = `${allLogs.length} entries`;
+
+  if (allLogs.length === 0) {
+    list.innerHTML = `<div class="log-empty">No cleanup logs yet — start cleaning!</div>`;
+    return;
+  }
+
+  const icons = {freed:'🗑️',moved:'📦',organized:'📁'};
+  const labels = {freed:'Deleted files',moved:'Moved to archive',organized:'Organized folders'};
+
+  list.innerHTML = allLogs.slice(0,6).map(log => {
+    const drive = allDrives.find(d => d.id === log.driveId);
+    const dateStr = log.createdAt?.toDate
+      ? log.createdAt.toDate().toLocaleDateString('en-US',{month:'short',day:'numeric'})
+      : 'Today';
+    return `<div class="log-entry">
+      <div class="log-icon ${log.action}">${icons[log.action]||'📝'}</div>
+      <div class="log-body">
+        <div class="log-drive">${drive?.name||log.driveName||'Drive'}</div>
+        <div class="log-detail">${labels[log.action]||log.action}${log.gbFreed ? ` · ${log.gbFreed} GB freed` : ''}</div>
+      </div>
+      <div class="log-date">${dateStr}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── STATS ──
+function updateStats() {
+  document.getElementById('stHDD').textContent = allDrives.filter(d=>d.type==='HDD').length;
+  document.getElementById('stSSD').textContent = allDrives.filter(d=>d.type==='SSD').length;
+  document.getElementById('stDanger').textContent = allDrives.filter(d=>getPct(d)>=85).length;
+  const freed = allLogs.reduce((s,l)=>s+(Number(l.gbFreed)||0),0);
+  document.getElementById('stFreed').textContent = freed;
+  document.getElementById('streakNum').textContent = calcStreak();
+}
+
+function calcStreak() {
+  if (!allLogs.length) return 0;
+  const days = [...new Set(allLogs.map(l => {
+    const d = l.createdAt?.toDate ? l.createdAt.toDate() : new Date();
+    return d.toDateString();
+  }))].sort((a,b)=>new Date(b)-new Date(a));
+  let streak = 0, check = new Date();
+  for (const day of days) {
+    if (new Date(day).toDateString() === check.toDateString()) {
+      streak++; check.setDate(check.getDate()-1);
+    } else break;
+  }
+  return streak;
+}
+
+function updateSidebar() {
+  const total = allDrives.reduce((s,d)=>s+(Number(d.capacity)||0),0);
+  const used = allDrives.reduce((s,d)=>s+(Number(d.used)||0),0);
+  const free = total - used;
+  const pct = total > 0 ? Math.round((used/total)*100) : 0;
+  const fmt = gb => gb >= 1000 ? (gb/1000).toFixed(1)+' TB' : gb+' GB';
+  document.getElementById('sidebarCap').textContent = fmt(total) || '—';
+  document.getElementById('sidebarUsed').textContent = fmt(used)+' used';
+  document.getElementById('sidebarFree').textContent = fmt(free)+' free';
+  document.getElementById('sidebarBar').style.width = pct+'%';
+}
+
+// ── ACTIONS ──
+window.assignToday = async function(driveId) {
+  const today = new Date().toDateString();
+  const updates = allDrives
+    .filter(d => d.todayDate === today && d.id !== driveId)
+    .map(d => updateDoc(doc(db,'drives',d.id),{todayDate:null}));
+  await Promise.all(updates);
+  await updateDoc(doc(db,'drives',driveId),{todayDate:today});
+  await loadDrives();
+  renderDrives();
+  renderTodayCard();
+  showToast('✅ Drive assigned for today!');
+};
+
+window.assignFromDetail = async function() {
+  if (!detailDriveId) return;
+  await assignToday(detailDriveId);
+  closeModal('detailModal');
+};
+
+window.markTodayDone = async function() {
+  const today = new Date().toDateString();
+  const d = allDrives.find(x => x.todayDate === today);
+  if (!d) { showToast('⚠️ No drive assigned for today'); return; }
+  await addDoc(collection(db,'cleanupLogs'), {
+    uid: currentUser.uid,
+    driveId: d.id,
+    driveName: d.name,
+    gbFreed: 0,
+    action: 'organized',
+    notes: 'Session marked complete',
+    createdAt: serverTimestamp()
+  });
+  await loadLogs();
+  updateStats();
+  renderLogs();
+  showToast('🎉 Cleanup session logged!');
+};
+
+window.openDetail = function(driveId) {
+  const d = allDrives.find(x => x.id === driveId);
+  if (!d) return;
+  detailDriveId = driveId;
+  const pct = getPct(d);
+  const fillClass = pct >= 85 ? 'fill-danger' : pct >= 70 ? 'fill-warn' : 'fill-safe';
+  document.getElementById('detailTitle').textContent = d.name;
+  document.getElementById('detailSub').textContent = `${d.type} · ${d.folder || 'No folder'} · ${d.location || 'No location'}`;
+  document.getElementById('detailGrid').innerHTML = `
+    <div class="detail-item"><div class="detail-item-label">Type</div><div class="detail-item-value">${d.type}</div></div>
+    <div class="detail-item"><div class="detail-item-label">Total Capacity</div><div class="detail-item-value">${d.capacity} GB</div></div>
+    <div class="detail-item"><div class="detail-item-label">Used Space</div><div class="detail-item-value">${d.used} GB</div></div>
+    <div class="detail-item"><div class="detail-item-label">Free Space</div><div class="detail-item-value">${(d.capacity||0)-(d.used||0)} GB</div></div>
+    <div class="detail-item" style="grid-column:1/-1">
+      <div class="detail-item-label">Usage — ${pct}%</div>
+      <div class="detail-fill-bar"><div class="detail-fill ${fillClass}" style="width:${Math.min(pct,100)}%"></div></div>
+    </div>
+    <div class="detail-item"><div class="detail-item-label">Location</div><div class="detail-item-value" style="font-size:13px">${d.location||'—'}</div></div>
+    <div class="detail-item"><div class="detail-item-label">Folder</div><div class="detail-item-value" style="font-size:13px">${d.folder||'—'}</div></div>
+    ${d.notes ? `<div class="detail-item" style="grid-column:1/-1"><div class="detail-item-label">Notes</div><div class="detail-item-value" style="font-size:13px;font-weight:400">${d.notes}</div></div>` : ''}
+  `;
+  const today = new Date().toDateString();
+  document.getElementById('assignTodayBtn').textContent =
+    d.todayDate === today ? '✓ Assigned Today' : 'Assign for Today';
+  openModal('detailModal');
+};
+
+// ── SAVE DRIVE ──
+window.saveDrive = async function() {
+  const btn = document.getElementById('saveDriveBtn');
+  const name = document.getElementById('dName').value.trim();
+  const type = document.getElementById('dType').value;
+  const capacity = Number(document.getElementById('dCap').value);
+  const used = Math.min(Number(document.getElementById('dUsed').value)||0, capacity);
+  const location = document.getElementById('dLoc').value.trim();
+  const folder = document.getElementById('dFolder').value;
+  const notes = document.getElementById('dNotes').value.trim();
+
+  if (!name) { showToast('⚠️ Please enter a drive name'); return; }
+  if (!capacity || capacity <= 0) { showToast('⚠️ Please enter a valid capacity'); return; }
+
+  btn.disabled = true; btn.textContent = 'Saving...';
+  try {
+    const fillPct = capacity > 0 ? Math.round((used/capacity)*100) : 0;
+    await addDoc(collection(db,'drives'), {
+      uid:currentUser.uid, name, type, capacity, used, fillPct,
+      location, folder, notes, createdAt:serverTimestamp()
+    });
+    closeModal('addModal');
+    ['dName','dLoc','dNotes'].forEach(id=>document.getElementById(id).value='');
+    ['dCap','dUsed'].forEach(id=>document.getElementById(id).value='');
+    await refreshAll();
+    showToast('💽 Drive registered!');
+  } catch(e) {
+    showToast('❌ Error saving drive: '+e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Register Drive';
+  }
+};
+
+// ── SAVE LOG ──
+window.saveLog = async function() {
+  const btn = document.getElementById('saveLogBtn');
+  const driveId = document.getElementById('logDrive').value;
+  const gbFreed = Number(document.getElementById('logGB').value)||0;
+  const action = document.getElementById('logAction').value;
+  const notes = document.getElementById('logNotes').value.trim();
+
+  if (!driveId) { showToast('⚠️ Please select a drive'); return; }
+
+  btn.disabled = true; btn.textContent = 'Saving...';
+  try {
+    const drive = allDrives.find(d=>d.id===driveId);
+    await addDoc(collection(db,'cleanupLogs'), {
+      uid:currentUser.uid, driveId,
+      driveName:drive?.name||'Drive',
+      gbFreed, action, notes, createdAt:serverTimestamp()
+    });
+    // If GB freed, update drive used space
+    if (gbFreed > 0 && drive) {
+      const newUsed = Math.max(0, (drive.used||0) - gbFreed);
+      const newPct = drive.capacity > 0 ? Math.round((newUsed/drive.capacity)*100) : 0;
+      await updateDoc(doc(db,'drives',driveId),{used:newUsed,fillPct:newPct});
+    }
+    closeModal('logModal');
+    document.getElementById('logGB').value='';
+    document.getElementById('logNotes').value='';
+    await refreshAll();
+    showToast('📋 Cleanup logged!');
+  } catch(e) {
+    showToast('❌ Error: '+e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Log Entry';
+  }
+};
+
+// ── MODAL HELPERS ──
+window.openAddModal = function() {
+  if (!currentUser) return;
+  openModal('addModal');
+};
+
+window.openLogModal = function() {
+  if (!currentUser) return;
+  const sel = document.getElementById('logDrive');
+  if (allDrives.length === 0) { showToast('⚠️ Add a drive first'); return; }
+  // Pre-select today's drive if set
+  const today = new Date().toDateString();
+  const todayDrive = allDrives.find(d=>d.todayDate===today);
+  sel.innerHTML = allDrives.map(d =>
+    `<option value="${d.id}" ${d.id===(todayDrive?.id)?' selected':''}>${d.name} (${d.type})</option>`
+  ).join('');
+  openModal('logModal');
+};
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
+
+// ── VIEW / FILTER ──
+window.setView = function(el, view) {
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  viewMode = view;
+  folderFilter = null;
+  clearFolderHighlights();
+  const titles = {all:'Drive Registry',danger:'⚠️ Danger Zone — Above 85%',cleanup:'Cleanup Log'};
+  document.getElementById('drivesTitle').textContent = titles[view]||'Drives';
+  document.getElementById('filterTabs').style.display = view==='cleanup'?'none':'flex';
+  renderDrives();
+};
+
+window.setFolder = function(navEl, folder) {
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if (navEl) navEl.classList.add('active');
+  folderFilter = folderFilter===folder ? null : folder;
+  viewMode = 'all';
+  clearFolderHighlights();
+  if (folderFilter) {
+    document.getElementById('fi-'+folder)?.classList.add('active-filter');
+    const navBtn = document.querySelector(`.nav-item[data-folder="${folder}"]`);
+    if (navBtn) navBtn.classList.add('active');
+    document.getElementById('drivesTitle').textContent = `Folder: ${folder}`;
+  } else {
+    document.getElementById('drivesTitle').textContent = 'Drive Registry';
+  }
+  renderDrives();
+};
+
+function clearFolderHighlights() {
+  document.querySelectorAll('.folder-item').forEach(f=>f.classList.remove('active-filter'));
+}
+
+window.setTypeFilter = function(f, el) {
+  typeFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderDrives();
+};
+
+window.onSearch = function(q) {
+  searchQ = q;
+  renderDrives();
+};
+
+// ── SIGN OUT ──
+window.doSignOut = async function() {
+  if (!confirm('Sign out of Storage Guru?')) return;
+  await signOut(auth);
+  window.location.href = 'index.html';
+};
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// ── OVERLAY CLICK TO CLOSE ──
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
+  });
+});
+</script>
+</body>
+</html>
