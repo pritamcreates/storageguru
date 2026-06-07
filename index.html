@@ -4,137 +4,153 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Storage Guru — Sign In</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --bg:#f4f3ef; --white:#fff; --dark:#0f0f0f;
-    --accent:#e8521a; --accent2:#f0a500;
-    --gray:#888; --border:#e0ddd8;
-    --hdd:#4a9edd; --ssd:#2ec4a9;
-  }
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:'Montserrat',sans-serif;background:var(--bg);min-height:100vh;display:flex;overflow:hidden;}
+  :root{--dark:#0a0a0a;--white:#fff;--gray:#999;--border:#e8e8e8;--blue:#2563eb;--bg:#f8f8f6;}
+  body{font-family:'DM Sans',sans-serif;background:var(--dark);min-height:100vh;display:flex;overflow:hidden;}
 
-  .left-panel{width:55%;background:var(--dark);display:flex;flex-direction:column;justify-content:space-between;padding:48px;position:relative;overflow:hidden;}
-  .left-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 80%,rgba(232,82,26,.15),transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(240,165,0,.1),transparent 50%);pointer-events:none;}
+  .scene{width:58%;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:40px 48px;}
+  .scene-noise{position:absolute;inset:0;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px;}
+  .scene-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:48px 48px;}
 
-  .logo-mark{display:flex;align-items:center;gap:12px;z-index:1;}
-  .logo-icon{width:44px;height:44px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;}
-  .logo-text{font-weight:800;font-size:20px;color:#fff;letter-spacing:-.3px;}
+  .logo{display:flex;align-items:center;gap:11px;z-index:10;position:relative;}
+  .logo-box{width:38px;height:38px;background:#fff;border-radius:9px;display:flex;align-items:center;justify-content:center;}
+  .logo-name{font-size:17px;font-weight:600;color:#fff;letter-spacing:-.2px;}
 
-  .drive-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:32px;z-index:1;}
-  .drive-dot{width:100%;aspect-ratio:1;border-radius:6px;animation:pulse 3s ease-in-out infinite;}
-  .drive-dot:nth-child(odd){animation-delay:.5s;}
-  .drive-dot.hdd{background:var(--hdd);opacity:.15;}
-  .drive-dot.ssd{background:var(--ssd);opacity:.15;}
-  .drive-dot.used{opacity:.4;}
-  .drive-dot.danger{background:var(--accent);opacity:.5;}
-  @keyframes pulse{0%,100%{opacity:.12;}50%{opacity:.3;}}
+  .folders-scene{position:absolute;inset:0;pointer-events:none;}
+  .folder-float{position:absolute;animation:floatUp linear infinite;}
+  @keyframes floatUp{
+    0%{transform:translateY(110vh) rotate(var(--r)) scale(var(--s));opacity:0;}
+    8%{opacity:1;}
+    85%{opacity:.7;}
+    100%{transform:translateY(-20vh) rotate(calc(var(--r) + 15deg)) scale(var(--s));opacity:0;}
+  }
 
-  .hero-text{z-index:1;}
-  .hero-text h1{font-size:clamp(32px,4vw,52px);font-weight:800;color:#fff;line-height:1.1;letter-spacing:-1px;margin-bottom:16px;}
-  .hero-text h1 span{color:var(--accent);}
-  .hero-text p{font-size:15px;color:#888;line-height:1.7;max-width:360px;}
+  .hero{z-index:10;position:relative;max-width:480px;}
+  .hero-eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#444;font-weight:500;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+  .hero-eyebrow::before{content:'';width:24px;height:1px;background:#333;}
+  .hero h1{font-family:'DM Serif Display',serif;font-size:clamp(40px,4.5vw,62px);color:#fff;line-height:1.05;letter-spacing:-.5px;margin-bottom:20px;}
+  .hero h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.3);}
+  .hero p{font-size:15px;color:#666;line-height:1.75;max-width:360px;}
 
-  .stats-strip{display:flex;gap:32px;z-index:1;border-top:1px solid #222;padding-top:32px;animation:fadeUp .8s ease .4s both;}
-  .stat-item{display:flex;flex-direction:column;gap:4px;}
-  .stat-val{font-size:28px;font-weight:800;color:#fff;}
-  .stat-label{font-size:12px;color:#555;letter-spacing:.5px;}
+  .scene-footer{z-index:10;position:relative;display:flex;gap:0;border-top:1px solid #1a1a1a;padding-top:28px;}
+  .s-stat{flex:1;padding-right:24px;border-right:1px solid #1a1a1a;margin-right:24px;}
+  .s-stat:last-child{border:none;margin:0;padding:0;}
+  .s-val{font-size:26px;font-weight:700;color:#fff;letter-spacing:-1px;line-height:1;}
+  .s-label{font-size:11px;color:#444;margin-top:4px;letter-spacing:.3px;}
 
-  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
 
-  .right-panel{width:45%;display:flex;flex-direction:column;justify-content:center;padding:64px 56px;background:#fff;position:relative;}
-  .right-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+  .signin-panel{width:42%;background:var(--white);display:flex;flex-direction:column;justify-content:center;padding:64px 52px;position:relative;}
+  .signin-panel::before{content:'';position:absolute;top:0;left:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,#e8e8e8 30%,#e8e8e8 70%,transparent);}
 
-  .form-header{margin-bottom:40px;animation:fadeUp .5s ease .1s both;}
-  .form-header h2{font-size:32px;font-weight:800;color:var(--dark);letter-spacing:-.5px;margin-bottom:8px;}
-  .form-header p{font-size:14px;color:var(--gray);}
+  .signin-badge{display:inline-flex;align-items:center;gap:6px;background:#f0f0f0;border-radius:20px;padding:5px 12px 5px 6px;margin-bottom:36px;animation:fadeUp .5s ease both;}
+  .signin-badge-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;}
+  .signin-badge span{font-size:11px;color:#666;font-weight:500;}
 
-  .msg{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:20px;display:none;}
-  .msg.error{background:#fff0ed;color:var(--accent);border:1px solid #ffd5cb;display:block;}
-  .msg.success{background:#edfaf7;color:#1a8a6f;border:1px solid #b3eadf;display:block;}
+  .signin-h{font-family:'DM Serif Display',serif;font-size:34px;color:var(--dark);line-height:1.1;margin-bottom:8px;animation:fadeUp .5s ease .05s both;}
+  .signin-sub{font-size:13px;color:var(--gray);margin-bottom:36px;animation:fadeUp .5s ease .1s both;line-height:1.6;}
 
-  .btn-google{width:100%;padding:16px;background:#fff;color:var(--dark);border:1.5px solid var(--border);border-radius:12px;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:border-color .2s,box-shadow .2s,transform .1s;animation:fadeUp .5s ease .2s both;}
-  .btn-google:hover{border-color:#bbb;box-shadow:0 4px 16px rgba(0,0,0,.1);transform:translateY(-1px);}
-  .btn-google:active{transform:translateY(0);}
-  .btn-google:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+  .msg{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:18px;display:none;}
+  .msg.error{background:#fef2f2;color:#dc2626;border:1px solid #fecaca;display:block;}
+  .msg.success{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;display:block;}
 
-  .divider-note{text-align:center;margin-top:24px;font-size:12px;color:#bbb;animation:fadeUp .5s ease .3s both;}
-  .divider-note span{color:var(--accent);font-weight:600;}
+  .btn-google{width:100%;padding:15px 20px;background:var(--dark);color:#fff;border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:background .2s,transform .15s,box-shadow .2s;animation:fadeUp .5s ease .15s both;letter-spacing:.1px;}
+  .btn-google:hover{background:#111;transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.15);}
+  .btn-google:active{transform:translateY(0);box-shadow:none;}
+  .btn-google:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .btn-google-inner{width:20px;height:20px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+  .signin-terms{margin-top:20px;font-size:11px;color:#bbb;text-align:center;line-height:1.6;animation:fadeUp .5s ease .2s both;}
 </style>
 </head>
 <body>
 
-<div class="left-panel">
-  <div class="logo-mark">
-    <div class="logo-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="6" width="18" height="5" rx="1.5" fill="white" opacity=".9"/>
-        <circle cx="18" cy="8.5" r="1.2" fill="#0f0f0f"/>
-        <rect x="3" y="13" width="18" height="5" rx="1.5" fill="white" opacity=".6"/>
-        <circle cx="18" cy="15.5" r="1.2" fill="#0f0f0f"/>
+<div class="scene">
+  <div class="scene-noise"></div>
+  <div class="scene-grid"></div>
+  <div class="folders-scene" id="foldersScene"></div>
+
+  <div class="logo">
+    <div class="logo-box">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="6" width="18" height="5" rx="1.5" fill="#0a0a0a" opacity=".9"/>
+        <circle cx="18" cy="8.5" r="1.2" fill="#fff"/>
+        <rect x="3" y="13" width="18" height="5" rx="1.5" fill="#0a0a0a" opacity=".6"/>
+        <circle cx="18" cy="15.5" r="1.2" fill="#fff"/>
       </svg>
     </div>
-    <span class="logo-text">Storage Guru</span>
+    <span class="logo-name">Storage Guru</span>
   </div>
 
-  <div class="drive-grid">
-    <div class="drive-dot hdd used"></div><div class="drive-dot hdd danger"></div>
-    <div class="drive-dot hdd used"></div><div class="drive-dot hdd"></div>
-    <div class="drive-dot ssd used"></div><div class="drive-dot hdd used"></div>
-    <div class="drive-dot hdd danger"></div><div class="drive-dot hdd used"></div>
-    <div class="drive-dot hdd"></div><div class="drive-dot ssd"></div>
-    <div class="drive-dot hdd used"></div><div class="drive-dot hdd danger"></div>
-    <div class="drive-dot hdd used"></div><div class="drive-dot hdd used"></div>
-    <div class="drive-dot ssd used"></div><div class="drive-dot hdd"></div>
-    <div class="drive-dot hdd used"></div><div class="drive-dot hdd danger"></div>
-    <div class="drive-dot hdd"></div><div class="drive-dot ssd used"></div>
-    <div class="drive-dot hdd used"></div><div class="drive-dot hdd used"></div>
-    <div class="drive-dot hdd danger"></div><div class="drive-dot hdd used"></div>
+  <div class="hero">
+    <div class="hero-eyebrow">Drive management</div>
+    <h1>Every drive.<br/>Every file.<br/><em>Always found.</em></h1>
+    <p>A systematic, cloud-synced registry for your entire HDD and SSD collection. One session a day keeps the chaos away.</p>
   </div>
 
-  <div class="hero-text">
-    <h1>Master your<br/><span>storage chaos.</span></h1>
-    <p>Track every HDD & SSD across your collection. One drive a day, systematically organized — forever.</p>
-  </div>
-
-  <div class="stats-strip">
-    <div class="stat-item"><span class="stat-val">40+</span><span class="stat-label">Drives tracked</span></div>
-    <div class="stat-item"><span class="stat-val">∞</span><span class="stat-label">Cloud synced</span></div>
-    <div class="stat-item"><span class="stat-val">1/day</span><span class="stat-label">Cleanup cadence</span></div>
+  <div class="scene-footer">
+    <div class="s-stat"><div class="s-val">40+</div><div class="s-label">Drives tracked</div></div>
+    <div class="s-stat"><div class="s-val">&#8734;</div><div class="s-label">Cloud synced</div></div>
+    <div class="s-stat"><div class="s-val">1/day</div><div class="s-label">Cleanup cadence</div></div>
   </div>
 </div>
 
-<div class="right-panel">
-  <div class="form-header">
-    <h2>Welcome back.</h2>
-    <p>Sign in or create your account with Google</p>
-  </div>
+<div class="signin-panel">
+  <div class="signin-badge"><div class="signin-badge-dot"></div><span>Secure &middot; Private &middot; Yours</span></div>
+  <div class="signin-h">Welcome back.</div>
+  <div class="signin-sub">Sign in to access your storage command center. New here? Your account is created automatically.</div>
 
   <div id="msg" class="msg"></div>
 
   <button class="btn-google" id="googleBtn" onclick="handleGoogleLogin()">
-    <svg width="20" height="20" viewBox="0 0 18 18">
-      <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
-      <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
-      <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
-      <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
-    </svg>
+    <div class="btn-google-inner">
+      <svg width="14" height="14" viewBox="0 0 18 18">
+        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+        <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+      </svg>
+    </div>
     Continue with Google
   </button>
 
-  <div class="divider-note">Your drives. Your data. Synced to <span>the cloud</span>.</div>
+  <div class="signin-terms">Your data is stored privately in Firestore,<br/>linked only to your Google account.</div>
 </div>
+
+<script>
+(function(){
+  const scene = document.getElementById('foldersScene');
+  const colors = [
+    ['#1e3a5f','#2563eb'],['#1a3a2a','#16a34a'],
+    ['#2a2a1a','#ca8a04'],['#1e1e3a','#7c3aed'],
+    ['#2a2a2a','#525252'],['#1a2a3a','#0ea5e9'],
+  ];
+  function makeSVG(w,c1,c2){
+    return '<svg width="'+w+'" height="'+(w*.75)+'" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 14C4 11.8 5.8 10 8 10H30L36 16H72C74.2 16 76 17.8 76 20V52C76 54.2 74.2 56 72 56H8C5.8 56 4 54.2 4 52V14Z" fill="'+c1+'"/><path d="M4 22H76V52C76 54.2 74.2 56 72 56H8C5.8 56 4 54.2 4 52V22Z" fill="'+c2+'" opacity=".5"/><rect x="14" y="30" width="24" height="3" rx="1.5" fill="white" opacity=".2"/><rect x="14" y="36" width="16" height="3" rx="1.5" fill="white" opacity=".15"/></svg>';
+  }
+  for(var i=0;i<18;i++){
+    var el=document.createElement('div');
+    el.className='folder-float';
+    var c=colors[i%colors.length];
+    var size=36+Math.random()*52;
+    var dur=14+Math.random()*20;
+    var delay=-Math.random()*dur;
+    var left=Math.random()*100;
+    var rot=(Math.random()-.5)*40;
+    var scale=.5+Math.random()*.7;
+    el.style.cssText='left:'+left+'%;--r:'+rot+'deg;--s:'+scale+';animation-duration:'+dur+'s;animation-delay:'+delay+'s;';
+    el.innerHTML=makeSVG(size,c[0],c[1]);
+    scene.appendChild(el);
+  }
+})();
+</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// ─────────────────────────────────────────────────────────
-// 🔧 PASTE YOUR FIREBASE CONFIG HERE
-//    Firebase Console → Project Settings → Your apps → SDK setup
-// ─────────────────────────────────────────────────────────
 const firebaseConfig = {
   apiKey: "AIzaSyDB7hnzaSPQt7EBAku-Xs-qXwni6WXBFCY",
   authDomain: "storage-guru.firebaseapp.com",
@@ -143,16 +159,14 @@ const firebaseConfig = {
   messagingSenderId: "453609358796",
   appId: "1:453609358796:web:cac761b6a4b491fc4c8969"
 };
-// ─────────────────────────────────────────────────────────
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: 'select_account' });
 
-const GOOGLE_BTN_HTML = `<svg width="20" height="20" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg> Continue with Google`;
+const GOOGLE_BTN_HTML = '<div class="btn-google-inner"><svg width="14" height="14" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg></div> Continue with Google';
 
-// If already signed in (or returning from redirect), go to dashboard
 onAuthStateChanged(auth, user => {
   if (user) window.location.href = 'dashboard.html';
 });
@@ -160,24 +174,22 @@ onAuthStateChanged(auth, user => {
 function showMsg(text, type) {
   const el = document.getElementById('msg');
   el.textContent = text;
-  el.className = `msg ${type}`;
+  el.className = 'msg ' + type;
 }
 
 window.handleGoogleLogin = async function() {
   const btn = document.getElementById('googleBtn');
   btn.disabled = true;
-  btn.textContent = 'Signing in…';
+  btn.textContent = 'Signing in...';
   try {
     await signInWithPopup(auth, provider);
-    // onAuthStateChanged will handle the redirect
   } catch(err) {
     if (err.code === 'auth/popup-blocked') {
-      // Fallback: full-page redirect (works on mobile / strict browsers)
       try {
         const { signInWithRedirect } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
         await signInWithRedirect(auth, provider);
       } catch(e2) {
-        showMsg('Pop-up blocked and redirect failed. Please allow pop-ups for this site.', 'error');
+        showMsg('Pop-up blocked. Please allow pop-ups for this site.', 'error');
         resetBtn();
       }
     } else if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
