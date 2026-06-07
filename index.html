@@ -7,74 +7,124 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
-  :root{--dark:#0a0a0a;--white:#fff;--gray:#999;--border:#e8e8e8;--blue:#2563eb;--bg:#f8f8f6;}
+  :root{--dark:#080808;--white:#fff;--gray:#666;--border:#e8e8e8;}
   body{font-family:'DM Sans',sans-serif;background:var(--dark);min-height:100vh;display:flex;overflow:hidden;}
 
+  /* ── LEFT SCENE ── */
   .scene{width:58%;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:40px 48px;}
-  .scene-noise{position:absolute;inset:0;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px;}
-  .scene-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:48px 48px;}
 
-  .logo{display:flex;align-items:center;gap:11px;z-index:10;position:relative;}
-  .logo-box{width:38px;height:38px;background:#fff;border-radius:9px;display:flex;align-items:center;justify-content:center;}
-  .logo-name{font-size:17px;font-weight:600;color:#fff;letter-spacing:-.2px;}
+  /* subtle grid */
+  .scene-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:56px 56px;pointer-events:none;}
 
-  .folders-scene{position:absolute;inset:0;pointer-events:none;}
-  .folder-float{position:absolute;animation:floatUp linear infinite;}
-  @keyframes floatUp{
-    0%{transform:translateY(110vh) rotate(var(--r)) scale(var(--s));opacity:0;}
-    8%{opacity:1;}
-    85%{opacity:.7;}
-    100%{transform:translateY(-20vh) rotate(calc(var(--r) + 15deg)) scale(var(--s));opacity:0;}
+  /* diagonal lines like image 2 */
+  .scene-lines{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+  .scene-lines::before{content:'';position:absolute;width:200%;height:200%;top:-50%;left:-50%;background:repeating-linear-gradient(120deg,transparent,transparent 180px,rgba(255,255,255,.018) 180px,rgba(255,255,255,.018) 181px);}
+  .scene-lines::after{content:'';position:absolute;width:200%;height:200%;top:-50%;left:-50%;background:repeating-linear-gradient(60deg,transparent,transparent 240px,rgba(255,255,255,.015) 240px,rgba(255,255,255,.015) 241px);}
+
+  /* ── FILE CARD STACK ── */
+  .card-stack{position:absolute;top:50%;left:50%;transform:translate(-50%,-54%);width:340px;}
+
+  /* Container that holds all tabs */
+  .file-cabinet{position:relative;width:100%;}
+
+  /* each tab/card */
+  .file-card{
+    position:absolute;left:0;right:0;
+    background:transparent;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:6px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 20px;height:44px;
+    cursor:pointer;
+    transition:transform .4s cubic-bezier(.25,.46,.45,.94), border-color .3s, background .3s;
+    user-select:none;
   }
+  .file-card:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.03);}
 
-  .hero{z-index:10;position:relative;max-width:480px;}
-  .hero-eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#444;font-weight:500;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
-  .hero-eyebrow::before{content:'';width:24px;height:1px;background:#333;}
-  .hero h1{font-family:'DM Serif Display',serif;font-size:clamp(40px,4.5vw,62px);color:#fff;line-height:1.05;letter-spacing:-.5px;margin-bottom:20px;}
-  .hero h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.3);}
-  .hero p{font-size:15px;color:#666;line-height:1.75;max-width:360px;}
+  /* tab handle top-left */
+  .file-card::before{
+    content:attr(data-label);
+    position:absolute;top:-24px;left:0;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    border-bottom:none;
+    border-radius:4px 4px 0 0;
+    font-size:9px;font-weight:600;letter-spacing:1.5px;
+    color:rgba(255,255,255,.35);
+    padding:5px 12px;white-space:nowrap;
+    text-transform:uppercase;
+  }
+  .file-card.top-card{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.2);}
+  .file-card.top-card::before{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.7);}
 
-  .scene-footer{z-index:10;position:relative;display:flex;gap:0;border-top:1px solid #1a1a1a;padding-top:28px;}
-  .s-stat{flex:1;padding-right:24px;border-right:1px solid #1a1a1a;margin-right:24px;}
+  .card-left{display:flex;align-items:center;gap:14px;}
+  .card-num{font-size:11px;color:rgba(255,255,255,.25);font-weight:500;letter-spacing:.5px;width:20px;}
+  .top-card .card-num{color:rgba(255,255,255,.6);}
+  .card-title{font-size:13px;font-weight:500;color:rgba(255,255,255,.4);letter-spacing:.2px;}
+  .top-card .card-title{color:rgba(255,255,255,.9);}
+  .card-right{font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.5px;}
+  .top-card .card-right{color:rgba(255,255,255,.45);}
+
+  /* cabinet tray at bottom */
+  .cabinet-tray{
+    position:absolute;left:-12px;right:-12px;bottom:-16px;height:20px;
+    background:#111;border:1px solid rgba(255,255,255,.08);border-radius:0 0 6px 6px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .cabinet-tray::before{content:'STORAGE GURU';font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.15);font-weight:600;}
+
+  /* center label */
+  .center-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;z-index:2;}
+  .center-label-title{font-family:'DM Serif Display',serif;font-size:15px;color:rgba(255,255,255,.6);letter-spacing:-.2px;margin-bottom:4px;}
+  .center-label-sub{font-size:10px;color:rgba(255,255,255,.2);letter-spacing:1px;text-transform:uppercase;}
+
+  /* ── LOGO ── */
+  .logo{display:flex;align-items:center;gap:11px;z-index:10;position:relative;}
+  .logo-box{width:36px;height:36px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+  .logo-name{font-size:16px;font-weight:600;color:#fff;letter-spacing:-.2px;}
+
+  /* ── BOTTOM STATS ── */
+  .scene-footer{z-index:10;position:relative;display:flex;gap:0;border-top:1px solid rgba(255,255,255,.06);padding-top:24px;}
+  .s-stat{flex:1;padding-right:24px;border-right:1px solid rgba(255,255,255,.06);margin-right:24px;}
   .s-stat:last-child{border:none;margin:0;padding:0;}
-  .s-val{font-size:26px;font-weight:700;color:#fff;letter-spacing:-1px;line-height:1;}
-  .s-label{font-size:11px;color:#444;margin-top:4px;letter-spacing:.3px;}
+  .s-val{font-size:24px;font-weight:700;color:#fff;letter-spacing:-1px;line-height:1;}
+  .s-label{font-size:11px;color:#333;margin-top:4px;}
 
   @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
 
+  /* ── RIGHT PANEL ── */
   .signin-panel{width:42%;background:var(--white);display:flex;flex-direction:column;justify-content:center;padding:64px 52px;position:relative;}
-  .signin-panel::before{content:'';position:absolute;top:0;left:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,#e8e8e8 30%,#e8e8e8 70%,transparent);}
+  .signin-panel::before{content:'';position:absolute;top:0;left:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,#e4e4e4 30%,#e4e4e4 70%,transparent);}
 
-  .signin-badge{display:inline-flex;align-items:center;gap:6px;background:#f0f0f0;border-radius:20px;padding:5px 12px 5px 6px;margin-bottom:36px;animation:fadeUp .5s ease both;}
-  .signin-badge-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;}
+  .signin-badge{display:inline-flex;align-items:center;gap:6px;background:#f5f5f5;border-radius:20px;padding:5px 12px 5px 8px;margin-bottom:32px;animation:fadeUp .5s ease both;}
+  .signin-badge-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0;}
   .signin-badge span{font-size:11px;color:#666;font-weight:500;}
 
-  .signin-h{font-family:'DM Serif Display',serif;font-size:34px;color:var(--dark);line-height:1.1;margin-bottom:8px;animation:fadeUp .5s ease .05s both;}
-  .signin-sub{font-size:13px;color:var(--gray);margin-bottom:36px;animation:fadeUp .5s ease .1s both;line-height:1.6;}
+  .signin-h{font-family:'DM Serif Display',serif;font-size:32px;color:#0a0a0a;line-height:1.1;margin-bottom:8px;animation:fadeUp .5s ease .05s both;}
+  .signin-sub{font-size:13px;color:#999;margin-bottom:32px;animation:fadeUp .5s ease .1s both;line-height:1.65;}
 
   .msg{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:18px;display:none;}
   .msg.error{background:#fef2f2;color:#dc2626;border:1px solid #fecaca;display:block;}
   .msg.success{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;display:block;}
 
-  .btn-google{width:100%;padding:15px 20px;background:var(--dark);color:#fff;border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:background .2s,transform .15s,box-shadow .2s;animation:fadeUp .5s ease .15s both;letter-spacing:.1px;}
-  .btn-google:hover{background:#111;transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.15);}
-  .btn-google:active{transform:translateY(0);box-shadow:none;}
+  .btn-google{width:100%;padding:14px 20px;background:#0a0a0a;color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:background .2s,transform .15s,box-shadow .2s;animation:fadeUp .5s ease .15s both;}
+  .btn-google:hover{background:#1a1a1a;transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.12);}
+  .btn-google:active{transform:translateY(0);}
   .btn-google:disabled{opacity:.5;cursor:not-allowed;transform:none;}
   .btn-google-inner{width:20px;height:20px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 
-  .signin-terms{margin-top:20px;font-size:11px;color:#bbb;text-align:center;line-height:1.6;animation:fadeUp .5s ease .2s both;}
+  .signin-terms{margin-top:18px;font-size:11px;color:#ccc;text-align:center;line-height:1.6;animation:fadeUp .5s ease .2s both;}
 </style>
 </head>
 <body>
 
 <div class="scene">
-  <div class="scene-noise"></div>
   <div class="scene-grid"></div>
-  <div class="folders-scene" id="foldersScene"></div>
+  <div class="scene-lines"></div>
 
   <div class="logo">
     <div class="logo-box">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
         <rect x="3" y="6" width="18" height="5" rx="1.5" fill="#0a0a0a" opacity=".9"/>
         <circle cx="18" cy="8.5" r="1.2" fill="#fff"/>
         <rect x="3" y="13" width="18" height="5" rx="1.5" fill="#0a0a0a" opacity=".6"/>
@@ -84,10 +134,16 @@
     <span class="logo-name">Storage Guru</span>
   </div>
 
-  <div class="hero">
-    <div class="hero-eyebrow">Drive management</div>
-    <h1>Every drive.<br/>Every file.<br/><em>Always found.</em></h1>
-    <p>A systematic, cloud-synced registry for your entire HDD and SSD collection. One session a day keeps the chaos away.</p>
+  <!-- FILE CABINET ANIMATION -->
+  <div class="card-stack">
+    <div class="file-cabinet" id="fileCabinet" style="height:280px;">
+      <!-- cards injected by JS -->
+      <div class="center-label">
+        <div class="center-label-title" id="centerTitle">Drive Registry</div>
+        <div class="center-label-sub" id="centerSub">Select a drive</div>
+      </div>
+      <div class="cabinet-tray"></div>
+    </div>
   </div>
 
   <div class="scene-footer">
@@ -120,30 +176,68 @@
 </div>
 
 <script>
+// ── FILE CABINET ANIMATION ──
 (function(){
-  const scene = document.getElementById('foldersScene');
-  const colors = [
-    ['#1e3a5f','#2563eb'],['#1a3a2a','#16a34a'],
-    ['#2a2a1a','#ca8a04'],['#1e1e3a','#7c3aed'],
-    ['#2a2a2a','#525252'],['#1a2a3a','#0ea5e9'],
+  const drives = [
+    {num:'01',title:'WD_Black_4TB',  right:'HDD · 92%', label:'INBOX'},
+    {num:'02',title:'Samsung_T7_1TB',right:'SSD · 45%', label:'ACTIVE'},
+    {num:'03',title:'Seagate_8TB',   right:'HDD · 67%', label:'ARCHIVE'},
+    {num:'04',title:'Crucial_MX500', right:'SSD · 38%', label:'ACTIVE'},
+    {num:'05',title:'WD_Elements_2T',right:'HDD · 81%', label:'INBOX'},
+    {num:'06',title:'SanDisk_Ext_1T',right:'SSD · 54%', label:'PERSONAL'},
+    {num:'07',title:'Seagate_Backup_2T',right:'HDD · 29%',label:'ARCHIVE'},
   ];
-  function makeSVG(w,c1,c2){
-    return '<svg width="'+w+'" height="'+(w*.75)+'" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 14C4 11.8 5.8 10 8 10H30L36 16H72C74.2 16 76 17.8 76 20V52C76 54.2 74.2 56 72 56H8C5.8 56 4 54.2 4 52V14Z" fill="'+c1+'"/><path d="M4 22H76V52C76 54.2 74.2 56 72 56H8C5.8 56 4 54.2 4 52V22Z" fill="'+c2+'" opacity=".5"/><rect x="14" y="30" width="24" height="3" rx="1.5" fill="white" opacity=".2"/><rect x="14" y="36" width="16" height="3" rx="1.5" fill="white" opacity=".15"/></svg>';
+
+  const cabinet = document.getElementById('fileCabinet');
+  const centerTitle = document.getElementById('centerTitle');
+  const centerSub = document.getElementById('centerSub');
+  const GAP = 36;
+  const TOTAL = drives.length;
+  let topIdx = 0;
+  let cards = [];
+
+  function buildCards() {
+    drives.forEach((d, i) => {
+      const el = document.createElement('div');
+      el.className = 'file-card';
+      el.setAttribute('data-label', d.label);
+      el.innerHTML = `<div class="card-left"><span class="card-num">${d.num}</span><span class="card-title">${d.title}</span></div><span class="card-right">${d.right}</span>`;
+      cabinet.insertBefore(el, cabinet.querySelector('.center-label'));
+      cards.push(el);
+    });
+    layout(false);
   }
-  for(var i=0;i<18;i++){
-    var el=document.createElement('div');
-    el.className='folder-float';
-    var c=colors[i%colors.length];
-    var size=36+Math.random()*52;
-    var dur=14+Math.random()*20;
-    var delay=-Math.random()*dur;
-    var left=Math.random()*100;
-    var rot=(Math.random()-.5)*40;
-    var scale=.5+Math.random()*.7;
-    el.style.cssText='left:'+left+'%;--r:'+rot+'deg;--s:'+scale+';animation-duration:'+dur+'s;animation-delay:'+delay+'s;';
-    el.innerHTML=makeSVG(size,c[0],c[1]);
-    scene.appendChild(el);
+
+  function layout(animate) {
+    const n = cards.length;
+    for (let i = 0; i < n; i++) {
+      // position relative to topIdx — top card at top
+      const offset = (i - topIdx + n) % n;
+      const y = offset * GAP;
+      cards[i].style.transition = animate ? 'transform .5s cubic-bezier(.25,.46,.45,.94), opacity .4s ease, background .3s, border-color .3s' : 'none';
+      cards[i].style.transform = `translateY(${y}px)`;
+      cards[i].style.opacity = offset > 4 ? '0' : (1 - offset * 0.13).toString();
+      cards[i].style.zIndex = (n - offset).toString();
+      cards[i].classList.toggle('top-card', offset === 0);
+    }
+    const top = drives[topIdx];
+    centerTitle.textContent = top.title;
+    centerSub.textContent = top.right + ' · ' + top.label;
   }
+
+  buildCards();
+
+  // Auto-cycle
+  setInterval(() => {
+    topIdx = (topIdx + 1) % TOTAL;
+    layout(true);
+  }, 2200);
+
+  // Click to cycle
+  cabinet.addEventListener('click', () => {
+    topIdx = (topIdx + 1) % TOTAL;
+    layout(true);
+  });
 })();
 </script>
 
@@ -165,7 +259,7 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: 'select_account' });
 
-const GOOGLE_BTN_HTML = '<div class="btn-google-inner"><svg width="14" height="14" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg></div> Continue with Google';
+const BTN_HTML = '<div class="btn-google-inner"><svg width="14" height="14" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg></div> Continue with Google';
 
 onAuthStateChanged(auth, user => {
   if (user) window.location.href = 'dashboard.html';
@@ -196,7 +290,7 @@ window.handleGoogleLogin = async function() {
       showMsg('Sign-in cancelled.', 'error');
       resetBtn();
     } else {
-      showMsg('Google sign-in failed: ' + (err.message || err.code), 'error');
+      showMsg('Sign-in failed: ' + (err.message || err.code), 'error');
       resetBtn();
     }
   }
@@ -205,7 +299,7 @@ window.handleGoogleLogin = async function() {
 function resetBtn() {
   const btn = document.getElementById('googleBtn');
   btn.disabled = false;
-  btn.innerHTML = GOOGLE_BTN_HTML;
+  btn.innerHTML = BTN_HTML;
 }
 </script>
 </body>

@@ -7,12 +7,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
   :root{
-    --bg:#f5f5f5;--white:#fff;--dark:#0a0a0a;
-    --gray:#888;--border:#e8e8e8;--border2:#f0f0f0;
-    --blue:#2563eb;--blue-bg:rgba(37,99,235,.07);--blue-border:rgba(37,99,235,.2);
-    --hdd:#2563eb;--ssd:#0ea5e9;
-    --danger:#dc2626;--warn:#d97706;--safe:#16a34a;
-    --sidebar-w:240px;
+    --bg:#f0f0f0;--white:#fff;--dark:#0a0a0a;
+    --gray:#9a9a9a;--border:#e4e4e4;--border2:#ebebeb;
+    --blue:#1a1a1a;--blue-bg:rgba(0,0,0,.04);--blue-border:rgba(0,0,0,.15);
+    --hdd:#1a1a1a;--ssd:#555;
+    --danger:#c0392b;--warn:#b7791f;--safe:#276749;
+    --sidebar-w:236px;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--dark);display:flex;height:100vh;overflow:hidden;}
@@ -228,10 +228,10 @@
     <div class="logo-mark">
       <div class="logo-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <rect x="3" y="6" width="18" height="5" rx="1.5" fill="white" opacity=".9"/>
-          <circle cx="18" cy="8.5" r="1.2" fill="#0f0f0f"/>
-          <rect x="3" y="13" width="18" height="5" rx="1.5" fill="white" opacity=".6"/>
-          <circle cx="18" cy="15.5" r="1.2" fill="#0f0f0f"/>
+          <rect x="3" y="6" width="18" height="5" rx="1.5" fill="#0a0a0a" opacity=".9"/>
+          <circle cx="18" cy="8.5" r="1.2" fill="#fff"/>
+          <rect x="3" y="13" width="18" height="5" rx="1.5" fill="#0a0a0a" opacity=".6"/>
+          <circle cx="18" cy="15.5" r="1.2" fill="#fff"/>
         </svg>
       </div>
       <span class="logo-text">Storage Guru</span>
@@ -261,19 +261,19 @@
 
     <div class="nav-label">Folders</div>
     <button class="nav-item" data-folder="_ACTIVE" onclick="setFolder(this,'_ACTIVE')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4a9edd" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
       _ACTIVE
     </button>
     <button class="nav-item" data-folder="_ARCHIVE" onclick="setFolder(this,'_ARCHIVE')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2ec4a9" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V7z"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
       _ARCHIVE
     </button>
     <button class="nav-item" data-folder="_INBOX" onclick="setFolder(this,'_INBOX')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f0a500" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V7z"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
       _INBOX
     </button>
     <button class="nav-item" data-folder="_PERSONAL" onclick="setFolder(this,'_PERSONAL')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8521a" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V7z"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
       _PERSONAL
     </button>
   </nav>
@@ -318,7 +318,9 @@
 
     <div class="streak-banner">
       <div class="streak-left">
-        <div class="streak-fire">🔥</div>
+        <div class="streak-fire">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 2C6.5 6 4 10 4 14a8 8 0 0016 0c0-2-.5-4-2-6-1 3-2 4-3 4-1.5 0-3-2-3-6z"/></svg>
+        </div>
         <div class="streak-text">
           <h3>Cleanup Streak</h3>
           <p>One drive a day keeps the chaos away</p>
@@ -343,11 +345,11 @@
             <button class="filter-tab active" onclick="setTypeFilter('all',this)">All</button>
             <button class="filter-tab" onclick="setTypeFilter('HDD',this)">HDD</button>
             <button class="filter-tab" onclick="setTypeFilter('SSD',this)">SSD</button>
-            <button class="filter-tab" onclick="setTypeFilter('danger',this)">⚠️ Full</button>
+            <button class="filter-tab" onclick="setTypeFilter('danger',this)">Full</button>
           </div>
         </div>
         <div class="drives-grid" id="drivesGrid">
-          <div class="empty-state"><div class="big-icon">💽</div><strong>Loading drives...</strong></div>
+          <div class="empty-state"><div class="big-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><rect x="2" y="6" width="20" height="12" rx="3"/><circle cx="18" cy="12" r="1.5" fill="#ccc"/></svg></div><strong>Loading drives...</strong></div>
         </div>
       </div>
 
@@ -360,8 +362,10 @@
           <div class="today-prog-row"><span>Storage usage</span><span id="todayPct">—</span></div>
           <div class="today-prog-bar"><div class="today-prog-fill" id="todayFill" style="width:0%"></div></div>
           <div class="today-actions">
-            <button class="btn-today primary" onclick="markTodayDone()">✓ Mark Complete</button>
-            <button class="btn-today secondary" onclick="openLogModal()">+ Log Entry</button>
+            <button class="btn-today primary" onclick="markTodayDone()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:middle;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Mark Complete
+            </button>
+            <button class="btn-today secondary" onclick="openLogModal()">Log Entry</button>
           </div>
         </div>
 
@@ -377,19 +381,19 @@
           <div class="section-title">Folder System</div>
           <div class="folder-grid">
             <div class="folder-item" id="fi-_ACTIVE" onclick="setFolder(null,'_ACTIVE')">
-              <div class="folder-ico" style="background:rgba(74,158,221,.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4a9edd" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></div>
+              <div class="folder-ico" style="background:#f0f0f0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></div>
               <div><div class="folder-name">_ACTIVE</div><div class="folder-sub">Current work</div></div>
             </div>
             <div class="folder-item" id="fi-_ARCHIVE" onclick="setFolder(null,'_ARCHIVE')">
-              <div class="folder-ico" style="background:rgba(46,196,169,.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2ec4a9" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V7z"/></svg></div>
+              <div class="folder-ico" style="background:#f0f0f0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></div>
               <div><div class="folder-name">_ARCHIVE</div><div class="folder-sub">Long-term</div></div>
             </div>
             <div class="folder-item" id="fi-_INBOX" onclick="setFolder(null,'_INBOX')">
-              <div class="folder-ico" style="background:rgba(240,165,0,.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f0a500" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V7z"/></svg></div>
+              <div class="folder-ico" style="background:#f0f0f0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></div>
               <div><div class="folder-name">_INBOX</div><div class="folder-sub">To be sorted</div></div>
             </div>
             <div class="folder-item" id="fi-_PERSONAL" onclick="setFolder(null,'_PERSONAL')">
-              <div class="folder-ico" style="background:rgba(232,82,26,.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8521a" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V7z"/></svg></div>
+              <div class="folder-ico" style="background:#f0f0f0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></div>
               <div><div class="folder-name">_PERSONAL</div><div class="folder-sub">Personal files</div></div>
             </div>
           </div>
@@ -442,9 +446,9 @@
       <div class="modal-field"><label>Space Freed (GB)</label><input type="number" id="logGB" placeholder="e.g. 50" min="0"/></div>
       <div class="modal-field"><label>Action Type</label>
         <select id="logAction">
-          <option value="freed">🗑️ Deleted files</option>
-          <option value="moved">📦 Moved to Archive</option>
-          <option value="organized">📁 Organized folders</option>
+          <option value="freed">Deleted files</option>
+          <option value="moved">Moved to Archive</option>
+          <option value="organized">Organized folders</option>
         </select>
       </div>
     </div>
@@ -465,6 +469,22 @@
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('detailModal')" style="flex:1">Close</button>
       <button class="btn-primary" id="assignTodayBtn" onclick="assignFromDetail()">Assign for Today</button>
+    </div>
+  </div>
+</div>
+
+<!-- SIGN OUT DIALOG -->
+<div class="signout-overlay" id="signoutOverlay">
+  <div class="signout-backdrop" onclick="cancelSignOut()"></div>
+  <div class="signout-dialog">
+    <div class="signout-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </div>
+    <h3>Sign out?</h3>
+    <p>You'll need to sign back in with Google to access your drives.</p>
+    <div class="signout-btns">
+      <button class="btn-so-cancel" onclick="cancelSignOut()">Cancel</button>
+      <button class="btn-so-confirm" onclick="confirmSignOut()">Sign out</button>
     </div>
   </div>
 </div>
@@ -512,7 +532,7 @@ onAuthStateChanged(auth, async user => {
   const name = user.displayName || user.email.split('@')[0];
   document.getElementById('userName').textContent = name;
   document.getElementById('userEmail').textContent = user.email;
-  document.getElementById('welcomeH1').textContent = `Welcome back, ${name.split(' ')[0]}`;
+  document.getElementById('welcomeH1').textContent = 'Welcome back, ' + name.split(' ')[0] + '.';
   document.getElementById('welcomeSub').textContent = `${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})} · Your storage command center.`;
 
   // Show Google profile photo if available
@@ -597,15 +617,15 @@ window.renderDrives = function() {
   const drives = getFilteredDrives();
 
   if (viewMode === 'cleanup') {
-    grid.innerHTML = `<div class="empty-state"><div class="big-icon">📋</div><strong>Cleanup Log View</strong><span>See the right panel for all cleanup sessions.</span></div>`;
+    grid.innerHTML = `<div class="empty-state"><div class="big-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div><strong>Cleanup Log View</strong><span>See the right panel for all cleanup sessions.</span></div>`;
     return;
   }
 
   if (drives.length === 0) {
     const msg = allDrives.length === 0
-      ? '<strong>No drives yet</strong><span>Click <b>Add Drive</b> to register your first drive.</span>'
+      ? '<strong>No drives yet</strong><span>Click Add Drive to register your first drive.</span>'
       : '<strong>No drives match this filter</strong><span>Try clearing the search or changing the filter.</span>';
-    grid.innerHTML = `<div class="empty-state"><div class="big-icon">💽</div>${msg}</div>`;
+    grid.innerHTML = `<div class="empty-state"><div class="big-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><rect x="2" y="6" width="20" height="12" rx="3"/><circle cx="18" cy="12" r="1.5" fill="#ccc"/></svg></div>${msg}</div>`;
     return;
   }
 
@@ -639,34 +659,34 @@ window.renderDrives = function() {
 };
 
 function hddSVG() {
-  return `<svg width="70" height="50" viewBox="0 0 70 50" fill="none" style="filter:drop-shadow(0 4px 10px rgba(74,158,221,.25))">
-    <rect x="2" y="7" width="66" height="36" rx="5" fill="#1e2a3a" stroke="#2d3d50" stroke-width="1.5"/>
-    <rect x="9" y="13" width="36" height="24" rx="3" fill="#243040"/>
-    <circle cx="56" cy="25" r="10" fill="#1a2535" stroke="#2d3d50"/>
-    <circle cx="56" cy="25" r="6" fill="#243040" stroke="#3a5070" stroke-width=".5"/>
-    <circle cx="56" cy="25" r="2.2" fill="#4a9edd"/>
-    <rect x="3" y="37" width="22" height="4" rx="1" fill="#2d3d50"/>
-    <circle cx="64" cy="13" r="2.5" fill="#4a9edd" opacity=".9"/>
-    <rect x="13" y="19" width="18" height="2" rx="1" fill="#2d3d50"/>
-    <rect x="13" y="24" width="13" height="2" rx="1" fill="#2d3d50"/>
-    <rect x="13" y="29" width="16" height="2" rx="1" fill="#2d3d50"/>
+  return `<svg width="72" height="52" viewBox="0 0 72 52" fill="none">
+    <rect x="1" y="6" width="70" height="40" rx="6" fill="#f0f0f0" stroke="#e0e0e0" stroke-width="1.5"/>
+    <rect x="8" y="12" width="38" height="28" rx="3" fill="#e8e8e8" stroke="#d8d8d8" stroke-width="1"/>
+    <rect x="12" y="18" width="20" height="2" rx="1" fill="#c8c8c8"/>
+    <rect x="12" y="23" width="14" height="2" rx="1" fill="#c8c8c8"/>
+    <rect x="12" y="28" width="17" height="2" rx="1" fill="#c8c8c8"/>
+    <circle cx="57" cy="26" r="11" fill="#e8e8e8" stroke="#d8d8d8" stroke-width="1"/>
+    <circle cx="57" cy="26" r="6.5" fill="#f0f0f0" stroke="#d0d0d0" stroke-width=".5"/>
+    <circle cx="57" cy="26" r="2.5" fill="#1a1a1a"/>
+    <circle cx="66" cy="13" r="2.5" fill="#1a1a1a" opacity=".6"/>
+    <rect x="2" y="40" width="24" height="4" rx="1.5" fill="#e0e0e0"/>
   </svg>`;
 }
 
 function ssdSVG() {
-  return `<svg width="70" height="50" viewBox="0 0 70 50" fill="none" style="filter:drop-shadow(0 4px 10px rgba(46,196,169,.25))">
-    <rect x="2" y="12" width="66" height="26" rx="4" fill="#0d2420" stroke="#1e4a40" stroke-width="1.5"/>
-    <rect x="6" y="15" width="54" height="18" rx="2" fill="#112e28"/>
-    <rect x="9" y="18" width="10" height="7" rx="1.5" fill="#1a4a3a" stroke="#2ec4a940" stroke-width=".5"/>
-    <rect x="22" y="18" width="10" height="7" rx="1.5" fill="#1a4a3a" stroke="#2ec4a940" stroke-width=".5"/>
-    <rect x="35" y="18" width="10" height="7" rx="1.5" fill="#1a4a3a" stroke="#2ec4a940" stroke-width=".5"/>
-    <rect x="9" y="27" width="14" height="4" rx="1" fill="#224a40" stroke="#2ec4a940" stroke-width=".5"/>
-    <rect x="52" y="18" width="6" height="11" rx="1" fill="#1a4a3a"/>
-    <rect x="2" y="33" width="18" height="3" rx="1" fill="#0a1e1a"/>
-    <rect x="22" y="33" width="3" height="3" rx=".5" fill="#2ec4a960"/>
-    <rect x="27" y="33" width="3" height="3" rx=".5" fill="#2ec4a960"/>
-    <rect x="32" y="33" width="3" height="3" rx=".5" fill="#2ec4a960"/>
-    <circle cx="64" cy="14" r="2.5" fill="#2ec4a9" opacity=".9"/>
+  return `<svg width="72" height="52" viewBox="0 0 72 52" fill="none">
+    <rect x="1" y="10" width="70" height="32" rx="5" fill="#f0f0f0" stroke="#e0e0e0" stroke-width="1.5"/>
+    <rect x="6" y="14" width="56" height="22" rx="2.5" fill="#e8e8e8" stroke="#d8d8d8" stroke-width="1"/>
+    <rect x="9" y="17" width="12" height="8" rx="2" fill="#fff" stroke="#d8d8d8" stroke-width=".8"/>
+    <rect x="24" y="17" width="12" height="8" rx="2" fill="#fff" stroke="#d8d8d8" stroke-width=".8"/>
+    <rect x="39" y="17" width="12" height="8" rx="2" fill="#fff" stroke="#d8d8d8" stroke-width=".8"/>
+    <rect x="9" y="27" width="18" height="5" rx="1.5" fill="#fff" stroke="#d8d8d8" stroke-width=".8"/>
+    <rect x="54" y="17" width="5" height="13" rx="1" fill="#e0e0e0"/>
+    <rect x="2" y="38" width="20" height="3" rx="1" fill="#e0e0e0"/>
+    <rect x="25" y="38.5" width="3" height="2" rx=".5" fill="#1a1a1a" opacity=".3"/>
+    <rect x="30" y="38.5" width="3" height="2" rx=".5" fill="#1a1a1a" opacity=".3"/>
+    <rect x="35" y="38.5" width="3" height="2" rx=".5" fill="#1a1a1a" opacity=".3"/>
+    <circle cx="66" cy="13" r="2.5" fill="#1a1a1a" opacity=".5"/>
   </svg>`;
 }
 
@@ -832,8 +852,8 @@ window.saveDrive = async function() {
   const folder = document.getElementById('dFolder').value;
   const notes = document.getElementById('dNotes').value.trim();
 
-  if (!name) { showToast('⚠️ Please enter a drive name'); return; }
-  if (!capacity || capacity <= 0) { showToast('⚠️ Please enter a valid capacity'); return; }
+  if (!name) { showToast('Please enter a drive name'); return; }
+  if (!capacity || capacity <= 0) { showToast('Please enter a valid capacity'); return; }
 
   btn.disabled = true; btn.textContent = 'Saving...';
   try {
@@ -846,9 +866,9 @@ window.saveDrive = async function() {
     ['dName','dLoc','dNotes'].forEach(id=>document.getElementById(id).value='');
     ['dCap','dUsed'].forEach(id=>document.getElementById(id).value='');
     await refreshAll();
-    showToast('💽 Drive registered!');
+    showToast('Drive registered');
   } catch(e) {
-    showToast('❌ Error saving drive: '+e.message);
+    showToast('Error saving: '+e.message);
   } finally {
     btn.disabled = false; btn.textContent = 'Register Drive';
   }
@@ -862,7 +882,7 @@ window.saveLog = async function() {
   const action = document.getElementById('logAction').value;
   const notes = document.getElementById('logNotes').value.trim();
 
-  if (!driveId) { showToast('⚠️ Please select a drive'); return; }
+  if (!driveId) { showToast('Select a drive'); return; }
 
   btn.disabled = true; btn.textContent = 'Saving...';
   try {
@@ -882,9 +902,9 @@ window.saveLog = async function() {
     document.getElementById('logGB').value='';
     document.getElementById('logNotes').value='';
     await refreshAll();
-    showToast('📋 Cleanup logged!');
+    showToast('Cleanup logged');
   } catch(e) {
-    showToast('❌ Error: '+e.message);
+    showToast('Error: '+e.message);
   } finally {
     btn.disabled = false; btn.textContent = 'Save Log Entry';
   }
@@ -899,7 +919,7 @@ window.openAddModal = function() {
 window.openLogModal = function() {
   if (!currentUser) return;
   const sel = document.getElementById('logDrive');
-  if (allDrives.length === 0) { showToast('⚠️ Add a drive first'); return; }
+  if (allDrives.length === 0) { showToast('Add a drive first'); return; }
   // Pre-select today's drive if set
   const today = new Date().toDateString();
   const todayDrive = allDrives.find(d=>d.todayDate===today);
@@ -919,7 +939,7 @@ window.setView = function(el, view) {
   viewMode = view;
   folderFilter = null;
   clearFolderHighlights();
-  const titles = {all:'Drive Registry',danger:'⚠️ Danger Zone — Above 85%',cleanup:'Cleanup Log'};
+  const titles = {all:'Drive Registry',danger:'Danger Zone — Above 85%',cleanup:'Cleanup Log'};
   document.getElementById('drivesTitle').textContent = titles[view]||'Drives';
   document.getElementById('filterTabs').style.display = view==='cleanup'?'none':'flex';
   renderDrives();
@@ -959,8 +979,13 @@ window.onSearch = function(q) {
 };
 
 // ── SIGN OUT ──
-window.doSignOut = async function() {
-  if (!confirm('Sign out of Storage Guru?')) return;
+window.doSignOut = function() {
+  document.getElementById('signoutOverlay').classList.add('active');
+};
+window.cancelSignOut = function() {
+  document.getElementById('signoutOverlay').classList.remove('active');
+};
+window.confirmSignOut = async function() {
   await signOut(auth);
   window.location.href = 'index.html';
 };
@@ -968,7 +993,7 @@ window.doSignOut = async function() {
 // ── TOAST ──
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  t.innerHTML = '<span class="toast-dot"></span>' + msg;
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 2800);
 }
