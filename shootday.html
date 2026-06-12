@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Storage Guru — Shoot Day</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#f2f2f0;--white:#fff;--dark:#111110;
+    --gray:#8a8a8a;--border:#e6e6e4;--border2:#ebebeb;
+    --accent:#111110;--accent-hover:#2a2a2a;
+    --danger:#c0392b;--warn:#b7791f;--safe:#276749;
+    --sidebar-w:236px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--dark);display:flex;height:100vh;overflow:hidden;}
+
+  /* ── SIDEBAR ── */
+  .sidebar{width:var(--sidebar-w);background:#fff;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;border-right:1px solid var(--border);}
+  .sidebar-header{padding:22px 16px 18px;border-bottom:1px solid var(--border);}
+  .logo-mark{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+  .logo-icon{width:32px;height:32px;background:var(--dark);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .logo-text{font-weight:700;font-size:14px;color:var(--dark);letter-spacing:-.2px;}
+  .user-card{display:flex;align-items:center;gap:9px;padding:9px 11px;background:var(--bg);border-radius:9px;border:1px solid var(--border);}
+  .user-avatar{width:30px;height:30px;border-radius:50%;background:#d8d8d6;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#555;flex-shrink:0;overflow:hidden;}
+  .user-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+  .user-name{font-size:12px;font-weight:600;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .user-email{font-size:10px;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sidebar-nav{padding:12px 10px;flex:1;}
+  .nav-label{font-size:9px;letter-spacing:1.5px;color:#aaa;text-transform:uppercase;padding:0 8px;margin:14px 0 5px;font-weight:600;}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;transition:background .15s,color .15s;color:#888;font-size:13px;font-weight:500;margin-bottom:1px;text-decoration:none;border:none;background:none;width:100%;font-family:'Montserrat',sans-serif;}
+  .nav-item:hover{background:var(--bg);color:var(--dark);}
+  .nav-item.active{background:var(--bg);color:var(--dark);font-weight:600;}
+  .nav-item svg{flex-shrink:0;opacity:.5;}
+  .nav-item.active svg{opacity:1;}
+  .sidebar-footer{padding:12px 10px;border-top:1px solid var(--border);}
+  .storage-summary{padding:11px;background:var(--bg);border-radius:9px;margin-bottom:10px;border:1px solid var(--border);}
+  .storage-row{display:flex;justify-content:space-between;font-size:10px;color:var(--gray);margin-bottom:6px;}
+  .storage-bar-bg{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:6px;}
+  .storage-bar-fill{height:100%;border-radius:2px;background:var(--dark);transition:width .6s ease;}
+  /* sidebar critical warning row */
+  .storage-warn-row{display:none;align-items:center;gap:6px;margin-top:5px;padding:5px 0 0;}
+  .storage-warn-row.visible{display:flex;}
+  .blink-warn{width:5px;height:5px;border-radius:50%;background:var(--warn);flex-shrink:0;animation:blinkWarn 1.5s ease-in-out infinite;}
+  @keyframes blinkWarn{0%,100%{opacity:1;}50%{opacity:.15;}}
+  .storage-warn-txt{font-size:10px;color:var(--warn);font-weight:600;}
+  .btn-signout{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;cursor:pointer;color:var(--gray);font-size:12px;font-weight:500;transition:all .2s;background:none;border:none;font-family:'Montserrat',sans-serif;width:100%;}
+  .btn-signout:hover{background:var(--bg);color:var(--dark);}
+
+  /* sign-out dialog */
+  .signout-overlay{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;}
+  .signout-overlay.active{display:flex;}
+  .signout-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);animation:fadeIn .2s ease;}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  .signout-dialog{background:#fff;border-radius:16px;padding:28px;width:320px;text-align:center;position:relative;z-index:1;animation:scaleIn .25s ease;}
+  @keyframes scaleIn{from{opacity:0;transform:scale(.95) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
+  .signout-icon{width:42px;height:42px;background:#f5f5f5;border-radius:11px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+  .signout-dialog h3{font-size:15px;font-weight:700;margin-bottom:5px;}
+  .signout-dialog p{font-size:12px;color:#888;margin-bottom:20px;line-height:1.5;}
+  .signout-btns{display:flex;gap:8px;}
+  .btn-so-cancel{flex:1;padding:10px;background:#f5f5f5;border:none;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:#666;transition:background .15s;}
+  .btn-so-cancel:hover{background:#eee;}
+  .btn-so-confirm{flex:1;padding:10px;background:#0a0a0a;border:none;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:#fff;transition:background .15s;}
+  .btn-so-confirm:hover{background:#222;}
+
+  /* ── MAIN ── */
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:15px 24px;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;gap:12px;}
+  .topbar-title{font-size:15px;font-weight:700;color:var(--dark);}
+  .topbar-right{display:flex;align-items:center;gap:8px;}
+
+  /* ── CONTENT ── */
+  .content{flex:1;overflow-y:auto;padding:24px;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ── RECORDS LIST ── */
+  .records-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;animation:fadeUp .3s ease both;}
+  .records-title{font-size:13px;font-weight:700;color:var(--dark);}
+  .records-count{font-size:11px;color:var(--gray);}
+  .records-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;animation:fadeUp .3s ease .05s both;}
+  .record-row{background:#fff;border:1.5px solid var(--border);border-radius:11px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .15s,box-shadow .15s;}
+  .record-row:hover{border-color:#ccc;box-shadow:0 4px 16px rgba(0,0,0,.06);}
+  .record-row.selected{border-color:var(--dark);background:#fafafa;}
+  .record-left{display:flex;flex-direction:column;gap:3px;}
+  .record-client{font-size:13px;font-weight:700;color:var(--dark);}
+  .record-meta{font-size:11px;color:var(--gray);}
+  .record-right{display:flex;align-items:center;gap:8px;}
+  .record-badge{font-size:9px;font-weight:700;letter-spacing:.5px;padding:3px 8px;border-radius:4px;text-transform:uppercase;}
+  .badge-draft{background:#f3f3f3;color:#999;}
+  .badge-saved{background:rgba(39,103,73,.1);color:var(--safe);}
+  .record-del-btn{background:none;border:none;cursor:pointer;color:#ccc;padding:2px 4px;border-radius:4px;font-size:14px;transition:color .15s,background .15s;line-height:1;}
+  .record-del-btn:hover{color:var(--danger);background:rgba(192,57,43,.07);}
+  .empty-records{text-align:center;padding:40px 20px;color:var(--gray);animation:fadeUp .3s ease both;}
+  .empty-records svg{opacity:.3;margin-bottom:12px;}
+  .empty-records strong{display:block;color:var(--dark);margin-bottom:5px;font-size:13px;}
+  .empty-records span{font-size:12px;}
+
+  /* ── FORM PANEL ── */
+  .form-panel{background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:24px;animation:fadeUp .3s ease .1s both;}
+  .form-section{margin-bottom:28px;}
+  .form-section-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .form-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+  .form-row{display:grid;gap:10px;margin-bottom:10px;}
+  .form-row.cols-2{grid-template-columns:1fr 1fr;}
+  .form-row.cols-3{grid-template-columns:1fr 1fr 1fr;}
+  .form-row.cols-1{grid-template-columns:1fr;}
+  .field label{display:block;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);margin-bottom:5px;}
+  .field input,.field select,.field textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Montserrat',sans-serif;font-size:13px;color:var(--dark);background:var(--bg);outline:none;transition:border-color .2s,background .2s;}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:#999;background:#fff;}
+  .field input::placeholder{color:#bbb;}
+
+  /* ── TEAM TABLE ── */
+  .team-table{width:100%;border-collapse:collapse;font-size:12px;}
+  .team-table th{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);padding:0 10px 8px;text-align:left;border-bottom:1.5px solid var(--border);}
+  .team-table th:first-child{padding-left:0;}
+  .team-table td{padding:6px 10px 6px;vertical-align:top;}
+  .team-table td:first-child{padding-left:0;}
+  .team-table tr:not(:last-child) td{border-bottom:1px solid var(--border2);}
+  .team-role{font-size:11px;font-weight:600;color:var(--gray);padding-top:10px;white-space:nowrap;}
+  .team-table input,.team-table select{width:100%;padding:7px 9px;border:1.5px solid var(--border);border-radius:7px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--dark);background:var(--bg);outline:none;transition:border-color .2s,background .2s;}
+  .team-table input:focus,.team-table select:focus{border-color:#999;background:#fff;}
+  .team-table input::placeholder{color:#bbb;}
+
+  /* ── TEAM CHECKBOX ── */
+  .team-cb-wrap{display:flex;align-items:center;justify-content:center;padding-top:8px;}
+  .team-cb-wrap input[type=checkbox]{display:none;}
+  .team-cb-box{width:20px;height:20px;border:2px solid var(--border);border-radius:5px;background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .15s,background .15s;flex-shrink:0;}
+  .team-cb-box:hover{border-color:#999;}
+  .team-cb-box svg{opacity:0;transition:opacity .15s;}
+  .team-cb-wrap input[type=checkbox]:checked + .team-cb-box{background:var(--dark);border-color:var(--dark);}
+  .team-cb-wrap input[type=checkbox]:checked + .team-cb-box svg{opacity:1;}
+
+  /* ── DELIVERY ROW ── */
+  .delivery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .delivery-item{display:flex;align-items:center;gap:9px;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;transition:border-color .15s,background .15s;}
+  .delivery-item.checked{border-color:var(--dark);background:#fff;}
+  .delivery-item input[type=checkbox]{width:14px;height:14px;accent-color:var(--dark);cursor:pointer;flex-shrink:0;}
+  .delivery-item label{font-size:12px;font-weight:500;cursor:pointer;user-select:none;}
+
+  /* ── FORM ACTIONS ── */
+  .form-actions{display:flex;gap:10px;padding-top:4px;}
+  .btn-save{flex:1;padding:13px;background:var(--dark);color:#fff;border:none;border-radius:9px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .btn-save:hover{background:#2a2a2a;transform:translateY(-1px);}
+  .btn-save:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .btn-new{padding:13px 18px;background:var(--bg);color:var(--gray);border:1.5px solid var(--border);border-radius:9px;font-family:'Montserrat',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;font-weight:600;}
+  .btn-new:hover{border-color:#bbb;color:var(--dark);}
+  .btn-print{padding:13px 16px;background:var(--bg);color:var(--gray);border:1.5px solid var(--border);border-radius:9px;font-family:'Montserrat',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;}
+  .btn-print:hover{border-color:#bbb;color:var(--dark);}
+
+  /* ── TOAST ── */
+  .toast{position:fixed;bottom:24px;right:24px;background:#0a0a0a;color:#fff;padding:12px 18px;border-radius:10px;font-size:12px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.25);z-index:999;transform:translateY(16px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;display:flex;align-items:center;gap:8px;border:1px solid #1a1a1a;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  .toast-dot{width:6px;height:6px;border-radius:50%;background:#fff;flex-shrink:0;}
+
+  /* ── STORAGE BADGE (90% warning topbar) ── */
+  .storage-warn{display:flex;align-items:center;gap:7px;padding:8px 14px;background:#fef9ee;border:1.5px solid #f0d080;border-radius:9px;font-size:12px;font-weight:600;color:var(--warn);}
+  .storage-warn svg{flex-shrink:0;}
+
+  /* ── LAYOUT ── */
+  .page-grid{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start;}
+
+  @media(max-width:900px){
+    .page-grid{grid-template-columns:1fr;}
+    .sidebar{display:none;}
+    .delivery-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media print{
+    .sidebar,.topbar,.form-actions,.records-header,.records-grid,.empty-records,.toast{display:none!important;}
+    .content{padding:0;}
+    .form-panel{border:none;padding:0;}
+    body{background:#fff;}
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo-mark">
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="6" width="18" height="5" rx="1.5" fill="#fff" opacity=".95"/>
+          <circle cx="18" cy="8.5" r="1.2" fill="#111"/>
+          <rect x="3" y="13" width="18" height="5" rx="1.5" fill="#fff" opacity=".6"/>
+          <circle cx="18" cy="15.5" r="1.2" fill="#111"/>
+        </svg>
+      </div>
+      <span class="logo-text">Storage Guru</span>
+    </div>
+    <div class="user-card">
+      <div class="user-avatar" id="userAvatar">SG</div>
+      <div>
+        <div class="user-name" id="userName">Loading...</div>
+        <div class="user-email" id="userEmail">...</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="dashboard.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item" href="dashboard.html#danger">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 19h20L12 2z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>
+      Danger Zone
+    </a>
+    <a class="nav-item" href="dashboard.html#cleanup">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+      Cleanup Log
+    </a>
+
+    <div class="nav-label">Tools</div>
+    <a class="nav-item active" href="shootday.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M20.447 16.105A9 9 0 1 1 20.448 7.9"/><path d="M15 3h6v6"/></svg>
+      Shoot Day
+    </a>
+
+    <div class="nav-label">Folders</div>
+    <a class="nav-item" href="dashboard.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+      _ACTIVE
+    </a>
+    <a class="nav-item" href="dashboard.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+      _ARCHIVE
+    </a>
+    <a class="nav-item" href="dashboard.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+      _INBOX
+    </a>
+    <a class="nav-item" href="dashboard.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+      _PERSONAL
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="storage-summary">
+      <div class="storage-row"><span>Total storage</span><span id="sidebarCap">—</span></div>
+      <div class="storage-bar-bg"><div class="storage-bar-fill" id="sidebarBar" style="width:0%"></div></div>
+      <div class="storage-row"><span id="sidebarUsed">—</span><span id="sidebarFree">—</span></div>
+      <div class="storage-warn-row" id="sidebarWarnRow">
+        <div class="blink-warn"></div>
+        <span class="storage-warn-txt" id="sidebarWarnTxt">Storage critical</span>
+      </div>
+    </div>
+    <button class="btn-signout" onclick="doSignOut()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign out
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">Shoot Day Records</div>
+    <div class="topbar-right">
+      <div class="storage-warn" id="storageWarnBadge" style="display:none;">
+        <div class="blink-warn"></div>
+        Storage above 90% — check drives
+      </div>
+      <button class="btn-save" style="flex:none;padding:9px 16px;font-size:12px;" onclick="newRecord()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Record
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-grid">
+
+      <!-- LEFT: records list -->
+      <div>
+        <div class="records-header">
+          <span class="records-title">Past Records</span>
+          <span class="records-count" id="recordsCount">0 records</span>
+        </div>
+        <div class="records-grid" id="recordsList">
+          <div class="empty-records" id="emptyRecords">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M20.447 16.105A9 9 0 1 1 20.448 7.9"/></svg>
+            <strong>No records yet</strong>
+            <span>Fill in the form and save your first shoot day.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: form -->
+      <div class="form-panel" id="formPanel">
+
+        <div class="form-section">
+          <div class="form-section-title">Event Info</div>
+          <div class="form-row cols-2">
+            <div class="field"><label>Client Name</label><input type="text" id="f_clientName" placeholder="e.g. Sharma Family"/></div>
+            <div class="field"><label>Event Date</label><input type="date" id="f_eventDate"/></div>
+          </div>
+          <div class="form-row cols-2">
+            <div class="field"><label>Event Type</label><input type="text" id="f_eventType" placeholder="e.g. Wedding, Corporate"/></div>
+            <div class="field"><label>Venue / Address</label><input type="text" id="f_venue" placeholder="e.g. Taj Palace, Delhi"/></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">Team &amp; Gear</div>
+          <table class="team-table">
+            <thead>
+              <tr>
+                <th style="width:130px">Role</th>
+                <th>Name</th>
+                <th style="width:110px">Camera</th>
+                <th style="width:68px;text-align:center">Single B.</th>
+                <th style="width:68px;text-align:center">Double B.</th>
+                <th style="width:55px">Files</th>
+                <th style="width:90px">Size (GB)</th>
+              </tr>
+            </thead>
+            <tbody id="teamBody"></tbody>
+          </table>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">Storage &amp; Management</div>
+          <div class="form-row cols-2">
+            <div class="field"><label>Managed By</label><input type="text" id="f_managedBy" placeholder="Your name"/></div>
+            <div class="field"><label>Date Managed</label><input type="date" id="f_managedDate"/></div>
+          </div>
+          <div class="form-row cols-2">
+            <div class="field"><label>HDD Name (Single Backup)</label><input type="text" id="f_hddSingle" placeholder="e.g. WD_Black_4TB"/></div>
+            <div class="field"><label>HDD Name (Double Backup)</label><input type="text" id="f_hddDouble" placeholder="e.g. Seagate_8TB"/></div>
+          </div>
+          <div class="form-row cols-1">
+            <div class="field"><label>Gmail ID &amp; Password</label><input type="text" id="f_gmail" placeholder="account@gmail.com / password"/></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">Deliverables</div>
+          <div class="delivery-grid">
+            <div class="delivery-item" onclick="toggleCheck(this,'f_photos',event)">
+              <input type="checkbox" id="f_photos"/>
+              <label for="f_photos">Final Photos</label>
+            </div>
+            <div class="delivery-item" onclick="toggleCheck(this,'f_videos',event)">
+              <input type="checkbox" id="f_videos"/>
+              <label for="f_videos">Final Videos</label>
+            </div>
+            <div class="delivery-item" onclick="toggleCheck(this,'f_short',event)">
+              <input type="checkbox" id="f_short"/>
+              <label for="f_short">Short Video</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-new" onclick="newRecord()">Clear</button>
+          <button class="btn-print" onclick="window.print()" title="Print this record">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print
+          </button>
+          <button class="btn-save" id="saveBtn" onclick="saveRecord()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Save Record
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- SIGN OUT DIALOG -->
+<div class="signout-overlay" id="signoutOverlay">
+  <div class="signout-backdrop" onclick="cancelSignOut()"></div>
+  <div class="signout-dialog">
+    <div class="signout-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </div>
+    <h3>Sign out?</h3>
+    <p>You'll need to sign back in with Google to access your drives.</p>
+    <div class="signout-btns">
+      <button class="btn-so-cancel" onclick="cancelSignOut()">Cancel</button>
+      <button class="btn-so-confirm" onclick="confirmSignOut()">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+  getDocs, query, where, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDB7hnzaSPQt7EBAku-Xs-qXwni6WXBFCY",
+  authDomain: "storage-guru.firebaseapp.com",
+  projectId: "storage-guru",
+  storageBucket: "storage-guru.firebasestorage.app",
+  messagingSenderId: "453609358796",
+  appId: "1:453609358796:web:cac761b6a4b491fc4c8969"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+let currentUser  = null;
+let allRecords   = [];
+let activeRecId  = null;
+
+const TEAM_KEYS = ['p1','v1','p2','v2','p3','v3'];
+const DEFAULT_ROLES = ['Photographer','Videographer','Photographer','Videographer','Photographer','Videographer'];
+const ROLE_OPTIONS = ['Photographer','Videographer','BTS / Drone','Photo Assistant','Video Assistant','Director','Other'];
+
+function roleSelect(key, defaultRole) {
+  const opts = ROLE_OPTIONS.map(o =>
+    `<option value="${o}"${o===defaultRole?' selected':''}>${o}</option>`
+  ).join('');
+  return `<select id="tm_role_${key}" style="width:100%">${opts}</select>`;
+}
+
+function cbCell(id) {
+  return `<div class="team-cb-wrap">
+    <input type="checkbox" id="${id}"/>
+    <div class="team-cb-box" data-cbid="${id}">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg>
+    </div>
+  </div>`;
+}
+
+function buildTeamTable() {
+  const tbody = document.getElementById('teamBody');
+  tbody.innerHTML = TEAM_KEYS.map((key, i) => `
+    <tr>
+      <td style="padding-right:6px">${roleSelect(key, DEFAULT_ROLES[i])}</td>
+      <td><input type="text" id="tm_name_${key}" placeholder="Name"/></td>
+      <td><input type="text" id="tm_cam_${key}"  placeholder="Model"/></td>
+      <td style="text-align:center">${cbCell('tm_sb_'+key)}</td>
+      <td style="text-align:center">${cbCell('tm_db_'+key)}</td>
+      <td><input type="number" id="tm_no_${key}" placeholder="0" min="0" style="width:100%"/></td>
+      <td><input type="number" id="tm_gb_${key}" placeholder="0.0" min="0" step="0.01" style="width:100%"/></td>
+    </tr>`).join('');
+}
+
+// Event delegation for checkbox boxes in team table
+document.getElementById('teamBody').addEventListener('click', function(e) {
+  const box = e.target.closest('.team-cb-box');
+  if (!box) return;
+  const cb = document.getElementById(box.dataset.cbid);
+  if (cb) cb.checked = !cb.checked;
+});
+
+// Build rows immediately so they're visible before auth resolves
+buildTeamTable();
+
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href = 'index.html'; return; }
+  currentUser = user;
+  const name = user.displayName || user.email.split('@')[0];
+  document.getElementById('userName').textContent  = name;
+  document.getElementById('userEmail').textContent = user.email;
+  const avatarEl = document.getElementById('userAvatar');
+  if (user.photoURL) { avatarEl.innerHTML = `<img src="${user.photoURL}" alt="avatar"/>`; }
+  else { avatarEl.textContent = name.charAt(0).toUpperCase(); }
+
+  setTodayDates();
+  await loadAll();
+});
+
+function setTodayDates() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('f_eventDate').value  = today;
+  document.getElementById('f_managedDate').value = today;
+}
+
+async function loadAll() {
+  await loadDrivesForSidebar();
+  await loadRecords();
+}
+
+async function loadDrivesForSidebar() {
+  try {
+    const snap = await getDocs(query(collection(db,'drives'), where('uid','==',currentUser.uid)));
+    const drives = snap.docs.map(d => d.data());
+    const total  = drives.reduce((s,d)=>s+(Number(d.capacity)||0),0);
+    const used   = drives.reduce((s,d)=>s+(Number(d.used)||0),0);
+    const free   = total - used;
+    const pct    = total > 0 ? Math.round((used/total)*100) : 0;
+    const fmt    = gb => gb >= 1000 ? (gb/1000).toFixed(1)+' TB' : gb+' GB';
+    document.getElementById('sidebarCap').textContent  = fmt(total) || '—';
+    document.getElementById('sidebarUsed').textContent = fmt(used)+' used';
+    document.getElementById('sidebarFree').textContent = fmt(free)+' free';
+    document.getElementById('sidebarBar').style.width  = pct+'%';
+    // sidebar 90% critical warning row
+    const warnRow = document.getElementById('sidebarWarnRow');
+    if (pct >= 90) {
+      warnRow.classList.add('visible');
+      document.getElementById('sidebarWarnTxt').textContent = `Storage critical — ${pct}% used`;
+      document.getElementById('storageWarnBadge').style.display = 'flex';
+    } else {
+      warnRow.classList.remove('visible');
+      document.getElementById('storageWarnBadge').style.display = 'none';
+    }
+  } catch(e) { /* non-critical */ }
+}
+
+async function loadRecords() {
+  try {
+    const snap = await getDocs(query(
+      collection(db,'shootDayRecords'),
+      where('uid','==',currentUser.uid),
+      orderBy('createdAt','desc')
+    ));
+    allRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) {
+    const snap = await getDocs(query(
+      collection(db,'shootDayRecords'),
+      where('uid','==',currentUser.uid)
+    ));
+    allRecords = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .sort((a,b) => {
+        const ta = a.createdAt?.toDate?.()?.getTime() ?? 0;
+        const tb = b.createdAt?.toDate?.()?.getTime() ?? 0;
+        return tb - ta;
+      });
+  }
+  renderRecordsList();
+}
+
+function renderRecordsList() {
+  const list  = document.getElementById('recordsList');
+  const empty = document.getElementById('emptyRecords');
+  const count = document.getElementById('recordsCount');
+  count.textContent = allRecords.length + ' record' + (allRecords.length !== 1 ? 's' : '');
+
+  if (allRecords.length === 0) {
+    list.innerHTML = '';
+    list.appendChild(empty);
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  list.innerHTML = allRecords.map(r => {
+    const dateStr = r.eventDate
+      ? new Date(r.eventDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+      : '—';
+    const isSel = r.id === activeRecId;
+    return `<div class="record-row${isSel?' selected':''}" onclick="loadRecord('${r.id}')">
+      <div class="record-left">
+        <div class="record-client">${r.clientName || 'Unnamed Client'}</div>
+        <div class="record-meta">${dateStr} · ${r.eventType || '—'}</div>
+      </div>
+      <div class="record-right">
+        <span class="record-badge badge-saved">Saved</span>
+        <button class="record-del-btn" title="Delete record" onclick="deleteRecord(event,'${r.id}')">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function collectForm() {
+  const team = TEAM_KEYS.map(key => ({
+    role:    document.getElementById('tm_role_'+key)?.value || '',
+    name:    document.getElementById('tm_name_'+key)?.value.trim() || '',
+    camera:  document.getElementById('tm_cam_'+key)?.value.trim() || '',
+    singleB: document.getElementById('tm_sb_'+key)?.checked || false,
+    doubleB: document.getElementById('tm_db_'+key)?.checked || false,
+    no:      document.getElementById('tm_no_'+key)?.value || '',
+    gb:      document.getElementById('tm_gb_'+key)?.value || '',
+  }));
+  return {
+    clientName:  document.getElementById('f_clientName').value.trim(),
+    eventDate:   document.getElementById('f_eventDate').value,
+    eventType:   document.getElementById('f_eventType').value.trim(),
+    venue:       document.getElementById('f_venue').value.trim(),
+    team,
+    managedBy:   document.getElementById('f_managedBy').value.trim(),
+    managedDate: document.getElementById('f_managedDate').value,
+    hddSingle:   document.getElementById('f_hddSingle').value.trim(),
+    hddDouble:   document.getElementById('f_hddDouble').value.trim(),
+    gmail:       document.getElementById('f_gmail').value.trim(),
+    deliverables: {
+      photos: document.getElementById('f_photos').checked,
+      videos: document.getElementById('f_videos').checked,
+      short:  document.getElementById('f_short').checked,
+    }
+  };
+}
+
+function populateForm(data) {
+  document.getElementById('f_clientName').value  = data.clientName  || '';
+  document.getElementById('f_eventDate').value   = data.eventDate   || '';
+  document.getElementById('f_eventType').value   = data.eventType   || '';
+  document.getElementById('f_venue').value       = data.venue       || '';
+  document.getElementById('f_managedBy').value   = data.managedBy   || '';
+  document.getElementById('f_managedDate').value = data.managedDate || '';
+  document.getElementById('f_hddSingle').value   = data.hddSingle   || '';
+  document.getElementById('f_hddDouble').value   = data.hddDouble   || '';
+  document.getElementById('f_gmail').value       = data.gmail       || '';
+
+  (data.team || []).forEach((row, i) => {
+    const key = TEAM_KEYS[i];
+    if (!key) return;
+    const setVal = (suffix, val) => { const el = document.getElementById('tm_'+suffix+'_'+key); if (el) el.value = val || ''; };
+    const setCb  = (suffix, val) => { const el = document.getElementById('tm_'+suffix+'_'+key); if (el) el.checked = !!val; };
+    setVal('role', row.role); setVal('name', row.name); setVal('cam', row.camera);
+    setCb('sb', row.singleB); setCb('db', row.doubleB);
+    setVal('no', row.no); setVal('gb', row.gb);
+  });
+
+  const d = data.deliverables || {};
+  setDelivery('f_photos', d.photos);
+  setDelivery('f_videos', d.videos);
+  setDelivery('f_short',  d.short);
+}
+
+function setDelivery(id, val) {
+  const cb   = document.getElementById(id);
+  const item = cb?.closest('.delivery-item');
+  if (!cb || !item) return;
+  cb.checked = !!val;
+  item.classList.toggle('checked', !!val);
+}
+
+window.loadRecord = function(id) {
+  const rec = allRecords.find(r => r.id === id);
+  if (!rec) return;
+  activeRecId = id;
+  populateForm(rec);
+  renderRecordsList();
+  document.getElementById('saveBtn').innerHTML =
+    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Update Record';
+};
+
+window.newRecord = function() {
+  activeRecId = null;
+  document.getElementById('f_clientName').value  = '';
+  document.getElementById('f_eventDate').value   = new Date().toISOString().split('T')[0];
+  document.getElementById('f_eventType').value   = '';
+  document.getElementById('f_venue').value       = '';
+  document.getElementById('f_managedBy').value   = '';
+  document.getElementById('f_managedDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('f_hddSingle').value   = '';
+  document.getElementById('f_hddDouble').value   = '';
+  document.getElementById('f_gmail').value       = '';
+  TEAM_KEYS.forEach((key, i) => {
+    const roleEl = document.getElementById('tm_role_'+key);
+    if (roleEl) roleEl.value = DEFAULT_ROLES[i];
+    ['name','cam','no','gb'].forEach(s => { const el = document.getElementById('tm_'+s+'_'+key); if (el) el.value = ''; });
+    ['sb','db'].forEach(s => { const el = document.getElementById('tm_'+s+'_'+key); if (el) el.checked = false; });
+  });
+  ['f_photos','f_videos','f_short'].forEach(id => setDelivery(id, false));
+  document.getElementById('saveBtn').innerHTML =
+    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Save Record';
+  renderRecordsList();
+};
+
+window.saveRecord = async function() {
+  const btn  = document.getElementById('saveBtn');
+  const data = collectForm();
+  if (!data.clientName) { showToast('⚠️ Client name is required'); return; }
+
+  btn.disabled = true;
+  const origHTML = btn.innerHTML;
+  btn.innerHTML = 'Saving...';
+
+  try {
+    const payload = { ...data, uid: currentUser.uid };
+    if (activeRecId) {
+      await updateDoc(doc(db,'shootDayRecords',activeRecId), { ...payload, updatedAt: serverTimestamp() });
+      showToast('✅ Record updated');
+    } else {
+      const ref = await addDoc(collection(db,'shootDayRecords'), { ...payload, createdAt: serverTimestamp() });
+      activeRecId = ref.id;
+      showToast('✅ Record saved');
+    }
+    await loadRecords();
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Update Record';
+  } catch(e) {
+    showToast('Error: ' + e.message);
+    btn.innerHTML = origHTML;
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+window.deleteRecord = async function(e, id) {
+  e.stopPropagation();
+  if (!confirm('Delete this shoot day record? This cannot be undone.')) return;
+  try {
+    await deleteDoc(doc(db,'shootDayRecords',id));
+    if (activeRecId === id) { activeRecId = null; newRecord(); }
+    await loadRecords();
+    showToast('Record deleted');
+  } catch(err) {
+    showToast('Delete failed: ' + err.message);
+  }
+};
+
+window.toggleCheck = function(itemEl, cbId, e) {
+  const cb = document.getElementById(cbId);
+  if (!cb) return;
+  if (!e || e.target !== cb) cb.checked = !cb.checked;
+  itemEl.classList.toggle('checked', cb.checked);
+};
+
+window.doSignOut    = () => document.getElementById('signoutOverlay').classList.add('active');
+window.cancelSignOut= () => document.getElementById('signoutOverlay').classList.remove('active');
+window.confirmSignOut = async () => { await signOut(auth); window.location.href = 'index.html'; };
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = '<span class="toast-dot"></span>' + msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
