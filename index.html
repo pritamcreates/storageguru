@@ -11,23 +11,18 @@
   body{font-family:'DM Sans',sans-serif;background:var(--dark);min-height:100vh;display:flex;overflow:hidden;}
 
   /* ── LEFT SCENE ── */
-  .scene{width:58%;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:40px 48px;}
+  /* FIX: removed overflow:hidden from .scene so dropdown is never clipped */
+  .scene{width:58%;position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:40px 48px;}
 
-  /* subtle grid */
-  .scene-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:56px 56px;pointer-events:none;}
-
-  /* diagonal lines like image 2 */
+  .scene-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:56px 56px;pointer-events:none;overflow:hidden;}
   .scene-lines{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
   .scene-lines::before{content:'';position:absolute;width:200%;height:200%;top:-50%;left:-50%;background:repeating-linear-gradient(120deg,transparent,transparent 180px,rgba(255,255,255,.018) 180px,rgba(255,255,255,.018) 181px);}
   .scene-lines::after{content:'';position:absolute;width:200%;height:200%;top:-50%;left:-50%;background:repeating-linear-gradient(60deg,transparent,transparent 240px,rgba(255,255,255,.015) 240px,rgba(255,255,255,.015) 241px);}
 
   /* ── FILE CARD STACK ── */
   .card-stack{position:absolute;top:50%;left:50%;transform:translate(-50%,-54%);width:340px;}
-
-  /* Container that holds all tabs */
   .file-cabinet{position:relative;width:100%;}
 
-  /* each tab/card */
   .file-card{
     position:absolute;left:0;right:0;
     background:transparent;
@@ -36,14 +31,17 @@
     display:flex;align-items:center;justify-content:space-between;
     padding:0 20px;height:44px;
     cursor:pointer;
+    /* FIX: removed z-index from transition — z-index is set directly, not animated */
     transition:transform .4s cubic-bezier(.25,.46,.45,.94), border-color .3s, background .3s;
     user-select:none;
+    /* FIX: no position+z-index stacking context here; z-index set via JS on style directly */
   }
   .file-card:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.03);}
+  .file-card.top-card{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.2);}
 
-  /* tab handle top-left */
-  .file-card::before{
-    content:attr(data-label);
+  /* Tab: position:absolute, sits above the card */
+  .file-card::before{display:none;}
+  .card-tab{
     position:absolute;top:-24px;left:0;
     background:rgba(255,255,255,.06);
     border:1px solid rgba(255,255,255,.08);
@@ -53,9 +51,13 @@
     color:rgba(255,255,255,.35);
     padding:5px 12px;white-space:nowrap;
     text-transform:uppercase;
+    cursor:pointer;
+    transition:background .2s,color .2s,border-color .2s;
+    user-select:none;
   }
-  .file-card.top-card{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.2);}
-  .file-card.top-card::before{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.7);}
+  .card-tab:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);}
+  .top-card .card-tab{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.7);}
+  .top-card .card-tab:hover{background:rgba(255,255,255,.18);color:#fff;}
 
   .card-left{display:flex;align-items:center;gap:14px;}
   .card-num{font-size:11px;color:rgba(255,255,255,.25);font-weight:500;letter-spacing:.5px;width:20px;}
@@ -65,7 +67,6 @@
   .card-right{font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.5px;}
   .top-card .card-right{color:rgba(255,255,255,.45);}
 
-  /* cabinet tray at bottom */
   .cabinet-tray{
     position:absolute;left:-12px;right:-12px;bottom:-16px;height:20px;
     background:#111;border:1px solid rgba(255,255,255,.08);border-radius:0 0 6px 6px;
@@ -73,17 +74,14 @@
   }
   .cabinet-tray::before{content:'STORAGE GURU';font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.15);font-weight:600;}
 
-  /* center label */
   .center-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;z-index:2;}
   .center-label-title{font-family:'DM Serif Display',serif;font-size:15px;color:rgba(255,255,255,.6);letter-spacing:-.2px;margin-bottom:4px;}
   .center-label-sub{font-size:10px;color:rgba(255,255,255,.2);letter-spacing:1px;text-transform:uppercase;}
 
-  /* ── LOGO ── */
   .logo{display:flex;align-items:center;gap:11px;z-index:10;position:relative;}
   .logo-box{width:36px;height:36px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;}
   .logo-name{font-size:16px;font-weight:600;color:#fff;letter-spacing:-.2px;}
 
-  /* ── BOTTOM STATS ── */
   .scene-footer{z-index:10;position:relative;display:flex;gap:0;border-top:1px solid rgba(255,255,255,.06);padding-top:24px;}
   .s-stat{flex:1;padding-right:24px;border-right:1px solid rgba(255,255,255,.06);margin-right:24px;}
   .s-stat:last-child{border:none;margin:0;padding:0;}
@@ -112,11 +110,101 @@
   .btn-google:active{transform:translateY(0);}
   .btn-google:disabled{opacity:.5;cursor:not-allowed;transform:none;}
   .btn-google-inner{width:20px;height:20px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-
   .signin-terms{margin-top:18px;font-size:11px;color:#ccc;text-align:center;line-height:1.6;animation:fadeUp .5s ease .2s both;}
+
+  /* ── LABEL TAG EDITOR ──
+     FIX: dropdown is rendered in a fixed-position portal (#dd-portal) that sits at
+     z-index:8500 in the root stacking context — escapes all card z-index scoping entirely */
+  #dd-portal{position:fixed;z-index:8500;pointer-events:none;}
+  #dd-portal.has-open{pointer-events:auto;}
+  .label-dropdown{
+    position:absolute;
+    background:#111;border:1px solid rgba(255,255,255,.12);
+    border-radius:8px;padding:6px;
+    display:none;flex-direction:column;gap:2px;
+    box-shadow:0 12px 32px rgba(0,0,0,.6);
+    min-width:130px;
+  }
+  .label-dropdown.open{display:flex;animation:fadeUp .15s ease both;}
+  .label-option{
+    font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;
+    color:rgba(255,255,255,.5);padding:7px 12px;border-radius:5px;
+    cursor:pointer;border:none;background:transparent;
+    font-family:'DM Sans',sans-serif;text-align:left;
+    transition:background .15s,color .15s;width:100%;
+  }
+  .label-option:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.95);}
+  .label-option.active{background:rgba(255,255,255,.1);color:#fff;}
+
+  /* ── CARD EDIT BUTTON ── */
+  .card-edit-btn{
+    background:transparent;border:1px solid rgba(255,255,255,.12);
+    color:rgba(255,255,255,.3);border-radius:4px;width:22px;height:22px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;padding:0;
+    transition:border-color .2s,color .2s,background .2s;
+  }
+  .card-edit-btn:hover{border-color:rgba(255,255,255,.45);color:rgba(255,255,255,.9);background:rgba(255,255,255,.07);}
+  .top-card .card-edit-btn{border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.6);}
+  .top-card .card-edit-btn:hover{border-color:#fff;color:#fff;background:rgba(255,255,255,.1);}
+
+  /* ── RENAME PANEL ── */
+  .rename-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.55);
+    backdrop-filter:blur(4px);z-index:9000;
+    display:none;align-items:center;justify-content:center;
+  }
+  .rename-overlay.open{display:flex;animation:fadeUp .2s ease both;}
+  .rename-box{
+    background:#fff;border-radius:14px;padding:32px 28px 24px;
+    width:360px;max-width:90vw;position:relative;
+    box-shadow:0 24px 60px rgba(0,0,0,.35);
+  }
+  .rename-box h3{font-family:'DM Serif Display',serif;font-size:20px;color:#0a0a0a;margin-bottom:4px;line-height:1.2;}
+  .rename-box p{font-size:12px;color:#999;margin-bottom:20px;}
+  .rename-input-wrap{position:relative;margin-bottom:16px;}
+  .rename-input{
+    width:100%;padding:12px 14px;border:1.5px solid #e8e8e8;border-radius:8px;
+    font-family:'DM Sans',sans-serif;font-size:14px;color:#0a0a0a;
+    outline:none;transition:border-color .2s;background:#fafafa;
+  }
+  .rename-input:focus{border-color:#0a0a0a;background:#fff;}
+  .rename-history{margin-bottom:20px;}
+  .rename-history-label{font-size:10px;font-weight:600;letter-spacing:1.2px;color:#bbb;text-transform:uppercase;margin-bottom:8px;}
+  .rename-history-list{display:flex;flex-wrap:wrap;gap:6px;}
+  .rename-history-chip{
+    font-size:11px;color:#666;background:#f3f3f3;border:1px solid #e8e8e8;
+    border-radius:20px;padding:3px 10px;display:flex;align-items:center;gap:6px;
+  }
+  .rename-history-chip .chip-date{font-size:9px;color:#bbb;}
+  .rename-history-empty{font-size:12px;color:#ccc;font-style:italic;}
+  .rename-actions{display:flex;gap:10px;}
+  .rename-cancel{
+    flex:1;padding:11px;border:1.5px solid #e8e8e8;border-radius:8px;
+    background:#fff;font-family:'DM Sans',sans-serif;font-size:13px;
+    color:#666;cursor:pointer;transition:border-color .2s,color .2s;
+  }
+  .rename-cancel:hover{border-color:#bbb;color:#333;}
+  .rename-save{
+    flex:1;padding:11px;border:none;border-radius:8px;
+    background:#0a0a0a;font-family:'DM Sans',sans-serif;font-size:13px;
+    color:#fff;cursor:pointer;font-weight:500;transition:background .2s,transform .15s;
+  }
+  .rename-save:hover{background:#1a1a1a;transform:translateY(-1px);}
+  .rename-save:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+  .rename-close{
+    position:absolute;top:14px;right:14px;width:26px;height:26px;
+    border-radius:50%;border:none;background:#f3f3f3;color:#999;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:16px;line-height:1;transition:background .2s,color .2s;
+  }
+  .rename-close:hover{background:#e8e8e8;color:#333;}
 </style>
 </head>
 <body>
+
+<!-- FIX BUG 2: portal div for dropdowns — lives in root stacking context, not inside any card -->
+<div id="dd-portal"></div>
 
 <div class="scene">
   <div class="scene-grid"></div>
@@ -134,10 +222,8 @@
     <span class="logo-name">Storage Guru</span>
   </div>
 
-  <!-- FILE CABINET ANIMATION -->
   <div class="card-stack">
     <div class="file-cabinet" id="fileCabinet" style="height:280px;">
-      <!-- cards injected by JS -->
       <div class="center-label">
         <div class="center-label-title" id="centerTitle">Drive Registry</div>
         <div class="center-label-sub" id="centerSub">Select a drive</div>
@@ -157,10 +243,8 @@
   <div class="signin-badge"><div class="signin-badge-dot"></div><span>Secure &middot; Private &middot; Yours</span></div>
   <div class="signin-h">Welcome back.</div>
   <div class="signin-sub">Sign in to access your storage command center. New here? Your account is created automatically.</div>
-
   <div id="msg" class="msg"></div>
-
-  <button class="btn-google" id="googleBtn" onclick="handleGoogleLogin()">
+  <button class="btn-google" id="googleBtn" aria-label="Sign in with Google" onclick="handleGoogleLogin()">
     <div class="btn-google-inner">
       <svg width="14" height="14" viewBox="0 0 18 18">
         <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
@@ -171,79 +255,350 @@
     </div>
     Continue with Google
   </button>
-
   <div class="signin-terms">Your data is stored privately in Firestore,<br/>linked only to your Google account.</div>
 </div>
 
+<!-- ── RENAME PANEL ── -->
+<div class="rename-overlay" id="renameOverlay" role="dialog" aria-modal="true" aria-labelledby="renamePanelTitle">
+  <div class="rename-box">
+    <button class="rename-close" id="renameClose" aria-label="Close rename panel">&#215;</button>
+    <!-- FIX BUG 5: h3 is now updated dynamically to show the drive being renamed -->
+    <h3 id="renamePanelTitle">Rename Drive</h3>
+    <p id="renameSubtitle">Enter a new name for this drive.</p>
+    <div class="rename-input-wrap">
+      <input class="rename-input" id="renameInput" type="text" maxlength="40"
+             placeholder="e.g. BackupDrive_01" autocomplete="off" spellcheck="false"/>
+    </div>
+    <div class="rename-history">
+      <div class="rename-history-label">Previous Names</div>
+      <div class="rename-history-list" id="renameHistoryList"></div>
+    </div>
+    <div class="rename-actions">
+      <button class="rename-cancel" id="renameCancel">Cancel</button>
+      <button class="rename-save" id="renameSave">Save Name</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ── FILE CABINET ANIMATION ──
+// ─────────────────────────────────────────────────────────────
+//  FILE CABINET + LABEL EDITOR + RENAME  (all in one IIFE)
+// ─────────────────────────────────────────────────────────────
 (function(){
+  const LABELS = ['INBOX','ACTIVE','ARCHIVE','PERSONAL','REVIEW','DONE'];
+
   const drives = [
-    {num:'01',title:'WD_Black_4TB',  right:'HDD · 92%', label:'INBOX'},
-    {num:'02',title:'Samsung_T7_1TB',right:'SSD · 45%', label:'ACTIVE'},
-    {num:'03',title:'Seagate_8TB',   right:'HDD · 67%', label:'ARCHIVE'},
-    {num:'04',title:'Crucial_MX500', right:'SSD · 38%', label:'ACTIVE'},
-    {num:'05',title:'WD_Elements_2T',right:'HDD · 81%', label:'INBOX'},
-    {num:'06',title:'SanDisk_Ext_1T',right:'SSD · 54%', label:'PERSONAL'},
-    {num:'07',title:'Seagate_Backup_2T',right:'HDD · 29%',label:'ARCHIVE'},
+    {num:'01', title:'WD_Black_4TB',       right:'HDD · 92%', label:'INBOX',    history:[]},
+    {num:'02', title:'Samsung_T7_1TB',     right:'SSD · 45%', label:'ACTIVE',   history:[]},
+    {num:'03', title:'Seagate_8TB',        right:'HDD · 67%', label:'ARCHIVE',  history:[]},
+    {num:'04', title:'Crucial_MX500',      right:'SSD · 38%', label:'ACTIVE',   history:[]},
+    {num:'05', title:'WD_Elements_2T',     right:'HDD · 81%', label:'INBOX',    history:[]},
+    {num:'06', title:'SanDisk_Ext_1T',     right:'SSD · 54%', label:'PERSONAL', history:[]},
+    {num:'07', title:'Seagate_Backup_2T',  right:'HDD · 29%', label:'ARCHIVE',  history:[]},
   ];
+  window._sgDrives = drives;
 
-  const cabinet = document.getElementById('fileCabinet');
+  const cabinet     = document.getElementById('fileCabinet');
   const centerTitle = document.getElementById('centerTitle');
-  const centerSub = document.getElementById('centerSub');
-  const GAP = 36;
-  const TOTAL = drives.length;
-  let topIdx = 0;
-  let cards = [];
+  const centerSub   = document.getElementById('centerSub');
+  const portal      = document.getElementById('dd-portal');
 
+  const GAP   = 36;
+  const TOTAL = drives.length;
+  let topIdx  = 0;
+  let cards   = [];
+
+  // ── BUILD CARDS ──────────────────────────────────────────
   function buildCards() {
     drives.forEach((d, i) => {
       const el = document.createElement('div');
       el.className = 'file-card';
-      el.setAttribute('data-label', d.label);
-      el.innerHTML = `<div class="card-left"><span class="card-num">${d.num}</span><span class="card-title">${d.title}</span></div><span class="card-right">${d.right}</span>`;
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('role', 'button');
+      el.setAttribute('aria-label', 'Drive ' + d.num + ': ' + d.title);
+      el.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cycleForward(); }
+      });
+
+      // FIX BUG 3: label text wrapped in a dedicated <span> so childNodes[0] is never ambiguous
+      // FIX BUG 2: tab button triggers portal-based dropdown — no dropdown DOM inside the card
+      el.innerHTML =
+        '<button class="card-tab" id="card-tab-' + i + '" data-idx="' + i + '" aria-haspopup="listbox" aria-expanded="false">' +
+          '<span class="card-tab-label" id="card-tab-label-' + i + '">' + d.label + '</span>' +
+        '</button>' +
+        '<div class="card-left">' +
+          '<span class="card-num">' + d.num + '</span>' +
+          '<span class="card-title" id="card-title-' + i + '">' + d.title + '</span>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:10px;">' +
+          '<span class="card-right">' + d.right + '</span>' +
+          '<button class="card-edit-btn" data-idx="' + i + '" title="Rename drive" aria-label="Rename ' + d.title + '">' +
+            '<svg width="11" height="11" viewBox="0 0 16 16" fill="none">' +
+              '<path d="M11.5 1.5a2.121 2.121 0 0 1 3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>' +
+            '</svg>' +
+          '</button>' +
+        '</div>';
+
       cabinet.insertBefore(el, cabinet.querySelector('.center-label'));
       cards.push(el);
     });
+
+    // Build portal dropdowns (one per drive, hidden by default)
+    drives.forEach((d, i) => {
+      const dd = document.createElement('div');
+      dd.className = 'label-dropdown';
+      dd.id = 'label-dd-' + i;
+      dd.setAttribute('role', 'listbox');
+      dd.setAttribute('aria-label', 'Choose label for drive ' + d.num);
+      LABELS.forEach(function(lbl) {
+        const btn = document.createElement('button');
+        btn.className = 'label-option' + (lbl === d.label ? ' active' : '');
+        btn.setAttribute('role', 'option');
+        btn.setAttribute('aria-selected', lbl === d.label ? 'true' : 'false');
+        btn.dataset.label = lbl;
+        btn.dataset.idx   = i;
+        btn.textContent   = lbl;
+        dd.appendChild(btn);
+      });
+      portal.appendChild(dd);
+    });
+
     layout(false);
   }
 
+  // ── LAYOUT ───────────────────────────────────────────────
   function layout(animate) {
-    const n = cards.length;
-    for (let i = 0; i < n; i++) {
-      // position relative to topIdx — top card at top
-      const offset = (i - topIdx + n) % n;
-      const y = offset * GAP;
-      cards[i].style.transition = animate ? 'transform .5s cubic-bezier(.25,.46,.45,.94), opacity .4s ease, background .3s, border-color .3s' : 'none';
-      cards[i].style.transform = `translateY(${y}px)`;
-      cards[i].style.opacity = offset > 4 ? '0' : (1 - offset * 0.13).toString();
-      cards[i].style.zIndex = (n - offset).toString();
+    var n = cards.length;
+    for (var i = 0; i < n; i++) {
+      var offset = (i - topIdx + n) % n;
+      var y = offset * GAP;
+      cards[i].style.transition = animate
+        ? 'transform .5s cubic-bezier(.25,.46,.45,.94), opacity .4s ease, background .3s, border-color .3s'
+        : 'none';
+      cards[i].style.transform = 'translateY(' + y + 'px)';
+      cards[i].style.opacity   = offset > 4 ? '0' : String(1 - offset * 0.13);
+      // FIX BUG 2: don't set z-index on cards — that creates stacking contexts that trap
+      // child z-index. Instead leave z-index unset; use pointer-events to handle overlap.
+      cards[i].style.pointerEvents = offset === 0 ? 'auto' : (offset <= 4 ? 'auto' : 'none');
       cards[i].classList.toggle('top-card', offset === 0);
     }
-    const top = drives[topIdx];
+    var top = drives[topIdx];
     centerTitle.textContent = top.title;
-    centerSub.textContent = top.right + ' · ' + top.label;
+    centerSub.textContent   = top.right + ' · ' + top.label;
   }
+
+  // ── CYCLE ────────────────────────────────────────────────
+  function cycleForward() {
+    topIdx = (topIdx + 1) % TOTAL;
+    layout(true);
+  }
+
+  var cycleTimer = setInterval(cycleForward, 2200);
+
+  cabinet.addEventListener('click', function(e) {
+    if (e.target.closest('.card-edit-btn') || e.target.closest('.card-tab')) return;
+    clearInterval(cycleTimer);
+    cycleForward();
+    cycleTimer = setInterval(cycleForward, 2200);
+  });
+
+  // ── LABEL DROPDOWN (portal-based) ────────────────────────
+  var openTabIdx = null;
+
+  function positionDropdown(idx) {
+    var tabEl = document.getElementById('card-tab-' + idx);
+    var rect  = tabEl.getBoundingClientRect();
+    var dd    = document.getElementById('label-dd-' + idx);
+    dd.style.top  = (rect.bottom + 6) + 'px';
+    dd.style.left = rect.left + 'px';
+  }
+
+  function openDropdown(idx) {
+    closeDropdown();
+    openTabIdx = idx;
+    var dd    = document.getElementById('label-dd-' + idx);
+    var tabEl = document.getElementById('card-tab-' + idx);
+    positionDropdown(idx);
+    dd.classList.add('open');
+    portal.classList.add('has-open');
+    tabEl.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeDropdown() {
+    if (openTabIdx === null) return;
+    var dd    = document.getElementById('label-dd-' + openTabIdx);
+    var tabEl = document.getElementById('card-tab-' + openTabIdx);
+    if (dd) { dd.classList.remove('open'); }
+    if (tabEl) { tabEl.setAttribute('aria-expanded', 'false'); }
+    portal.classList.remove('has-open');
+    openTabIdx = null;
+  }
+
+  // Tab button click — toggle dropdown
+  document.addEventListener('click', function(e) {
+    var tabBtn = e.target.closest('.card-tab');
+    if (tabBtn) {
+      e.stopPropagation();
+      var idx = parseInt(tabBtn.dataset.idx, 10);
+      if (openTabIdx === idx) { closeDropdown(); } else { openDropdown(idx); }
+      return;
+    }
+
+    // Option click inside portal
+    var opt = e.target.closest('.label-option');
+    if (opt) {
+      e.stopPropagation();
+      var idx   = parseInt(opt.dataset.idx, 10);
+      var label = opt.dataset.label;
+      var drive = drives[idx];
+      drive.label = label;
+
+      // FIX BUG 3: update the dedicated label span — no childNodes guesswork
+      var labelSpan = document.getElementById('card-tab-label-' + idx);
+      if (labelSpan) labelSpan.textContent = label;
+
+      // Update portal option active states + aria
+      var dd = document.getElementById('label-dd-' + idx);
+      dd.querySelectorAll('.label-option').forEach(function(o) {
+        var isActive = o.dataset.label === label;
+        o.classList.toggle('active', isActive);
+        o.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+
+      // Sync center subtitle
+      if (centerTitle.textContent === drive.title) {
+        centerSub.textContent = drive.right + ' · ' + label;
+      }
+
+      closeDropdown();
+      return;
+    }
+
+    // Click anywhere else — close
+    closeDropdown();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeDropdown();
+  });
+
+  // Edit button click
+  document.addEventListener('click', function(e) {
+    var editBtn = e.target.closest('.card-edit-btn');
+    if (editBtn) {
+      e.stopPropagation();
+      closeDropdown();
+      openRenamePanel(parseInt(editBtn.dataset.idx, 10));
+    }
+  });
 
   buildCards();
 
-  // Auto-cycle
-  setInterval(() => {
-    topIdx = (topIdx + 1) % TOTAL;
-    layout(true);
-  }, 2200);
+  // ── RENAME PANEL ─────────────────────────────────────────
+  var activeRenameIdx = null;
 
-  // Click to cycle
-  cabinet.addEventListener('click', () => {
-    topIdx = (topIdx + 1) % TOTAL;
-    layout(true);
+  var renameOverlay  = document.getElementById('renameOverlay');
+  var renameInput    = document.getElementById('renameInput');
+  var renameSaveBtn  = document.getElementById('renameSave');
+  var renameCancelBtn= document.getElementById('renameCancel');
+  var renameCloseBtn = document.getElementById('renameClose');
+  var renameHistList = document.getElementById('renameHistoryList');
+  var renameSubtitle = document.getElementById('renameSubtitle');
+  var renamePanelTitle = document.getElementById('renamePanelTitle');
+
+  function fmtDate(ts) {
+    return new Date(ts).toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'});
+  }
+
+  function renderHistory(drive) {
+    renameHistList.innerHTML = '';
+    if (!drive.history || drive.history.length === 0) {
+      renameHistList.innerHTML = '<span class="rename-history-empty">No previous names yet.</span>';
+      return;
+    }
+    drive.history.slice().reverse().forEach(function(h) {
+      var chip = document.createElement('div');
+      chip.className = 'rename-history-chip';
+      chip.innerHTML = '<span>' + h.name + '</span><span class="chip-date">' + fmtDate(h.ts) + '</span>';
+      renameHistList.appendChild(chip);
+    });
+  }
+
+  function validateRenameInput() {
+    var drive = drives[activeRenameIdx];
+    var val   = renameInput.value.trim();
+    // FIX BUG 6: disable Save if empty OR if name is unchanged
+    renameSaveBtn.disabled = !val || val === drive.title;
+  }
+
+  window.openRenamePanel = function(idx) {
+    activeRenameIdx = idx;
+    var drive = drives[idx];
+    // FIX BUG 5: update h3 with actual drive name so aria-labelledby is meaningful
+    renamePanelTitle.textContent = 'Rename: ' + drive.title;
+    renameSubtitle.textContent   = 'Drive ' + drive.num + ' · ' + drive.right + ' · ' + drive.label;
+    renameInput.value = drive.title;
+    validateRenameInput(); // FIX BUG 6: validate on open, not just on keystroke
+    renderHistory(drive);
+    renameOverlay.classList.add('open');
+    requestAnimationFrame(function() { renameInput.focus(); renameInput.select(); });
+  };
+
+  function closeRenamePanel() {
+    renameOverlay.classList.remove('open');
+    activeRenameIdx = null;
+  }
+
+  function doSave() {
+    if (activeRenameIdx === null) return;
+    var drive   = drives[activeRenameIdx];
+    var newName = renameInput.value.trim();
+    if (!newName || newName === drive.title) { closeRenamePanel(); return; }
+
+    // Push old name to history
+    drive.history.push({ name: drive.title, ts: Date.now() });
+    drive.title = newName;
+
+    // Update card title span
+    var titleSpan = document.getElementById('card-title-' + activeRenameIdx);
+    if (titleSpan) titleSpan.textContent = newName;
+
+    // Update center label if this drive is currently showing
+    if (centerTitle.textContent === drive.history[drive.history.length - 1].name) {
+      centerTitle.textContent = newName;
+    }
+
+    // Update card aria-label
+    var card = cards[activeRenameIdx];
+    if (card) card.setAttribute('aria-label', 'Drive ' + drive.num + ': ' + newName);
+
+    // Update edit button aria-label
+    var editBtn = card ? card.querySelector('.card-edit-btn') : null;
+    if (editBtn) editBtn.setAttribute('aria-label', 'Rename ' + newName);
+
+    // FIX BUG 5: update h3 to new name while panel is still visible briefly
+    renamePanelTitle.textContent = 'Rename: ' + newName;
+
+    closeRenamePanel();
+  }
+
+  renameSaveBtn.addEventListener('click', doSave);
+  renameCancelBtn.addEventListener('click', closeRenamePanel);
+  renameCloseBtn.addEventListener('click', closeRenamePanel);
+  renameOverlay.addEventListener('click', function(e) { if (e.target === renameOverlay) closeRenamePanel(); });
+  renameInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doSave();
+    if (e.key === 'Escape') closeRenamePanel();
   });
+  renameInput.addEventListener('input', validateRenameInput); // FIX BUG 6: reuse same validator
+
 })();
 </script>
 
+<!-- ── FIREBASE AUTH ── -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDB7hnzaSPQt7EBAku-Xs-qXwni6WXBFCY",
@@ -254,12 +609,19 @@ const firebaseConfig = {
   appId: "1:453609358796:web:cac761b6a4b491fc4c8969"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+const app      = initializeApp(firebaseConfig);
+const auth     = getAuth(app);
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: 'select_account' });
 
-const BTN_HTML = '<div class="btn-google-inner"><svg width="14" height="14" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg></div> Continue with Google';
+const BTN_INNER_HTML =
+  '<div class="btn-google-inner">' +
+  '<svg width="14" height="14" viewBox="0 0 18 18">' +
+  '<path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>' +
+  '<path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>' +
+  '<path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>' +
+  '<path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>' +
+  '</svg></div> Continue with Google';
 
 onAuthStateChanged(auth, user => {
   if (user) window.location.href = 'dashboard.html';
@@ -271,6 +633,12 @@ function showMsg(text, type) {
   el.className = 'msg ' + type;
 }
 
+function resetBtn() {
+  const btn = document.getElementById('googleBtn');
+  btn.disabled = false;
+  btn.innerHTML = BTN_INNER_HTML;
+}
+
 window.handleGoogleLogin = async function() {
   const btn = document.getElementById('googleBtn');
   btn.disabled = true;
@@ -280,7 +648,6 @@ window.handleGoogleLogin = async function() {
   } catch(err) {
     if (err.code === 'auth/popup-blocked') {
       try {
-        const { signInWithRedirect } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
         await signInWithRedirect(auth, provider);
       } catch(e2) {
         showMsg('Pop-up blocked. Please allow pop-ups for this site.', 'error');
@@ -295,12 +662,6 @@ window.handleGoogleLogin = async function() {
     }
   }
 };
-
-function resetBtn() {
-  const btn = document.getElementById('googleBtn');
-  btn.disabled = false;
-  btn.innerHTML = BTN_HTML;
-}
 </script>
 </body>
 </html>
