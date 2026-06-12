@@ -199,7 +199,7 @@
   </div>
 
   <nav class="sidebar-nav">
-    <a class="nav-item" href="dashboard.html">
+    <a class="nav-item" href="dashboard.html" id="navBackDashboard">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       Dashboard
     </a>
@@ -722,6 +722,18 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }
+
+// If loaded inside dashboard iframe, intercept dashboard links to close overlay instead
+(function() {
+  const inIframe = window.self !== window.top;
+  if (!inIframe) return;
+  document.querySelectorAll('a[href="dashboard.html"], a[href^="dashboard.html"]').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      try { window.parent.closeShootDay(); } catch(_) { window.top.location.href = 'dashboard.html'; }
+    });
+  });
+})();
 </script>
 </body>
 </html>
