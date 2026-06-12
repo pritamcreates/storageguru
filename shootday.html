@@ -171,6 +171,10 @@
     .form-panel{border:none;padding:0;}
     body{background:#fff;}
   }
+
+  /* Hide sidebar when loaded inside dashboard iframe */
+  body.in-iframe .sidebar{display:none!important;}
+  body.in-iframe .main{flex:1;}
 </style>
 </head>
 <body>
@@ -723,10 +727,11 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// If loaded inside dashboard iframe, intercept dashboard links to close overlay instead
+// If loaded inside dashboard iframe, hide sidebar and intercept dashboard links
 (function() {
   const inIframe = window.self !== window.top;
   if (!inIframe) return;
+  document.body.classList.add('in-iframe');
   document.querySelectorAll('a[href="dashboard.html"], a[href^="dashboard.html"]').forEach(link => {
     link.addEventListener('click', e => {
       e.preventDefault();
