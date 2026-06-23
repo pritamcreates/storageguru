@@ -4,11 +4,12 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Storage Guru — Sign In</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<meta name="description" content="Sign in to Storage Guru — your personal storage command center for photographers and videographers."/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
   :root{--dark:#080808;--white:#fff;--gray:#666;--border:#e8e8e8;}
-  body{font-family:'DM Sans',sans-serif;background:var(--dark);min-height:100vh;display:flex;overflow:hidden;}
+  body{font-family:'Montserrat',sans-serif;background:var(--dark);min-height:100vh;display:flex;overflow-x:hidden;}
 
   /* ── LEFT SCENE ── */
   /* FIX: removed overflow:hidden from .scene so dropdown is never clipped */
@@ -75,12 +76,12 @@
   .cabinet-tray::before{content:'STORAGE GURU';font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.15);font-weight:600;}
 
   .center-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;z-index:2;}
-  .center-label-title{font-family:'DM Serif Display',serif;font-size:15px;color:rgba(255,255,255,.6);letter-spacing:-.2px;margin-bottom:4px;}
+  .center-label-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:15px;color:rgba(255,255,255,.6);letter-spacing:-.2px;margin-bottom:4px;}
   .center-label-sub{font-size:10px;color:rgba(255,255,255,.2);letter-spacing:1px;text-transform:uppercase;}
 
   .logo{display:flex;align-items:center;gap:11px;z-index:10;position:relative;}
   .logo-box{width:36px;height:36px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;}
-  .logo-name{font-size:16px;font-weight:600;color:#fff;letter-spacing:-.2px;}
+  .logo-name{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:600;color:#fff;letter-spacing:-.2px;}
 
   .scene-footer{z-index:10;position:relative;display:flex;gap:0;border-top:1px solid rgba(255,255,255,.06);padding-top:24px;}
   .s-stat{flex:1;padding-right:24px;border-right:1px solid rgba(255,255,255,.06);margin-right:24px;}
@@ -98,14 +99,14 @@
   .signin-badge-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0;}
   .signin-badge span{font-size:11px;color:#666;font-weight:500;}
 
-  .signin-h{font-family:'DM Serif Display',serif;font-size:32px;color:#0a0a0a;line-height:1.1;margin-bottom:8px;animation:fadeUp .5s ease .05s both;}
+  .signin-h{font-family:'Montserrat',sans-serif;font-weight:800;font-size:32px;color:#0a0a0a;line-height:1.1;margin-bottom:8px;animation:fadeUp .5s ease .05s both;}
   .signin-sub{font-size:13px;color:#999;margin-bottom:32px;animation:fadeUp .5s ease .1s both;line-height:1.65;}
 
   .msg{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:18px;display:none;}
   .msg.error{background:#fef2f2;color:#dc2626;border:1px solid #fecaca;display:block;}
   .msg.success{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;display:block;}
 
-  .btn-google{width:100%;padding:14px 20px;background:#0a0a0a;color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:background .2s,transform .15s,box-shadow .2s;animation:fadeUp .5s ease .15s both;}
+  .btn-google{width:100%;padding:14px 20px;background:#0a0a0a;color:#fff;border:none;border-radius:10px;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:background .2s,transform .15s,box-shadow .2s;animation:fadeUp .5s ease .15s both;}
   .btn-google:hover{background:#1a1a1a;transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.12);}
   .btn-google:active{transform:translateY(0);}
   .btn-google:disabled{opacity:.5;cursor:not-allowed;transform:none;}
@@ -160,7 +161,7 @@
     width:360px;max-width:90vw;position:relative;
     box-shadow:0 24px 60px rgba(0,0,0,.35);
   }
-  .rename-box h3{font-family:'DM Serif Display',serif;font-size:20px;color:#0a0a0a;margin-bottom:4px;line-height:1.2;}
+  .rename-box h3{font-family:'Montserrat',sans-serif;font-weight:800;font-size:20px;color:#0a0a0a;margin-bottom:4px;line-height:1.2;}
   .rename-box p{font-size:12px;color:#999;margin-bottom:20px;}
   .rename-input-wrap{position:relative;margin-bottom:16px;}
   .rename-input{
@@ -181,17 +182,36 @@
   .rename-actions{display:flex;gap:10px;}
   .rename-cancel{
     flex:1;padding:11px;border:1.5px solid #e8e8e8;border-radius:8px;
-    background:#fff;font-family:'DM Sans',sans-serif;font-size:13px;
+    background:#fff;font-family:'Montserrat',sans-serif;font-size:13px;
     color:#666;cursor:pointer;transition:border-color .2s,color .2s;
   }
   .rename-cancel:hover{border-color:#bbb;color:#333;}
   .rename-save{
     flex:1;padding:11px;border:none;border-radius:8px;
-    background:#0a0a0a;font-family:'DM Sans',sans-serif;font-size:13px;
+    background:#0a0a0a;font-family:'Montserrat',sans-serif;font-size:13px;
     color:#fff;cursor:pointer;font-weight:500;transition:background .2s,transform .15s;
   }
   .rename-save:hover{background:#1a1a1a;transform:translateY(-1px);}
   .rename-save:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:768px){
+    body{flex-direction:column;overflow-y:auto;height:auto;min-height:100vh;}
+    .scene{width:100%;min-height:300px;padding:28px 24px;justify-content:flex-start;gap:0;}
+    .signin-panel{width:100%;padding:36px 24px 52px;}
+    .signin-panel::before{display:none;}
+    .card-stack{display:none;}
+    .scene-footer{display:none;}
+    .scene-lines{display:none;}
+    .signin-h{font-size:26px;}
+    .signin-sub{font-size:12px;}
+  }
+  @media(max-width:480px){
+    .scene{min-height:220px;padding:20px 18px;}
+    .signin-panel{padding:28px 18px 44px;}
+    .signin-h{font-size:22px;}
+    .btn-google{font-size:13px;padding:12px 16px;}
+  }
   .rename-close{
     position:absolute;top:14px;right:14px;width:26px;height:26px;
     border-radius:50%;border:none;background:#f3f3f3;color:#999;

@@ -10,6 +10,7 @@
     --bg:#f2f2f0;--white:#fff;--dark:#111110;
     --gray:#8a8a8a;--border:#e6e6e4;--border2:#ebebeb;
     --accent:#111110;--accent-hover:#2a2a2a;
+    --blue:#2563eb;
     --hdd:#111110;--ssd:#555;
     --danger:#c0392b;--warn:#b7791f;--safe:#276749;
     --sidebar-w:236px;
@@ -76,6 +77,10 @@
   .blink{width:5px;height:5px;border-radius:50%;background:var(--dark);animation:blink 2s ease-in-out infinite;flex-shrink:0;}
   @keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
 
+  /* HAMBURGER */
+  .hamburger{display:none;align-items:center;justify-content:center;width:38px;height:38px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;flex-shrink:0;transition:background .15s;flex-shrink:0;}
+  .hamburger:hover{background:#e8e8e8;}
+
   /* CONTENT */
   .content{flex:1;overflow-y:auto;padding:22px 24px;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
@@ -116,8 +121,9 @@
   .drives-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px;margin-bottom:18px;}
   .drive-card{background:#fff;border:1.5px solid var(--border);border-radius:13px;padding:14px;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;position:relative;}
   .drive-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.07);border-color:#ccc;}
-  .drive-card.is-danger{border-color:rgba(220,38,38,.2);background:#fffefe;}
-  .drive-card.is-today{border-color:rgba(37,99,235,.25);background:#fafbff;}
+  .drive-card.is-danger{border-color:rgba(220,38,38,.25);background:#fffefe;animation:dangerPulse 2.5s ease-in-out infinite;}
+  @keyframes dangerPulse{0%,100%{border-color:rgba(220,38,38,.2);}50%{border-color:rgba(220,38,38,.55);box-shadow:0 0 0 3px rgba(220,38,38,.05);}}
+  .drive-card.is-today{border-color:rgba(37,99,235,.3);background:#fafbff;}
   .drive-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
   .badge{font-size:9px;font-weight:700;letter-spacing:.5px;padding:3px 7px;border-radius:4px;text-transform:uppercase;}
   .badge-hdd{background:rgba(37,99,235,.1);color:var(--hdd);}
@@ -129,7 +135,7 @@
   .drive-name{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .drive-loc{font-size:11px;color:var(--gray);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .fill-bar-bg{height:5px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:4px;}
-  .fill-bar{height:100%;border-radius:3px;transition:width .8s ease;}
+  .fill-bar{height:100%;border-radius:3px;width:0%;transition:width .9s cubic-bezier(.23,1,.32,1);}
   .fill-safe{background:var(--dark);}
   .fill-warn{background:var(--warn);}
   .fill-danger{background:var(--danger);}
@@ -140,6 +146,10 @@
   .empty-state{grid-column:1/-1;text-align:center;padding:48px;color:var(--gray);}
   .empty-state .big-icon{font-size:40px;margin-bottom:12px;}
   .empty-state strong{display:block;margin-bottom:6px;color:var(--dark);}
+  .empty-state .btn-empty{display:inline-flex;align-items:center;gap:7px;margin-top:14px;padding:10px 20px;background:var(--dark);color:#fff;border:none;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:background .2s;}
+  .empty-state .btn-empty:hover{background:#2a2a2a;}
+  /* Search highlight */
+  mark.sh{background:#fef08a;color:#0a0a0a;border-radius:2px;padding:0 1px;font-style:normal;}
 
   /* RIGHT PANEL */
   .right-col{display:flex;flex-direction:column;gap:16px;}
@@ -148,7 +158,8 @@
   .today-card::before{content:'';position:absolute;inset:0;background:none;pointer-events:none;}
   .today-tag{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:1px;color:var(--gray);text-transform:uppercase;font-weight:600;margin-bottom:12px;z-index:1;position:relative;}
   .today-drive-name{font-size:17px;font-weight:800;color:var(--dark);margin-bottom:3px;position:relative;z-index:1;}
-  .today-drive-meta{font-size:11px;color:var(--gray);margin-bottom:14px;position:relative;z-index:1;}
+  .today-drive-meta{font-size:11px;color:var(--gray);margin-bottom:2px;position:relative;z-index:1;}
+  .today-time{font-size:10px;color:#bbb;margin-bottom:12px;position:relative;z-index:1;}
   .today-prog-row{display:flex;justify-content:space-between;font-size:11px;color:var(--gray);margin-bottom:5px;position:relative;z-index:1;}
   .today-prog-bar{height:4px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:14px;position:relative;z-index:1;}
   .today-prog-fill{height:100%;border-radius:3px;background:var(--dark);transition:width .6s ease;}
@@ -204,13 +215,16 @@
   .btn-cancel{padding:13px 18px;background:var(--bg);color:var(--gray);border:1.5px solid var(--border);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;}
   .btn-cancel:hover{border-color:#bbb;color:var(--dark);}
 
-  /* DETAIL PANEL inside modal */
   .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
   .detail-item{background:var(--bg);border-radius:10px;padding:12px;}
   .detail-item-label{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);margin-bottom:4px;}
   .detail-item-value{font-size:15px;font-weight:700;}
   .detail-fill-bar{height:8px;background:#e5e3de;border-radius:4px;overflow:hidden;margin-top:6px;}
-  .detail-fill{height:100%;border-radius:4px;}
+  .detail-fill{height:100%;border-radius:4px;width:0%;transition:width .9s cubic-bezier(.23,1,.32,1);}
+
+  /* Edit drive button */
+  .btn-edit-drive{padding:13px 16px;background:var(--bg);color:var(--gray);border:1.5px solid var(--border);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;}
+  .btn-edit-drive:hover{border-color:#bbb;color:var(--dark);}
 
   /* sidebar critical warning row */
   .storage-warn-row{display:none;align-items:center;gap:6px;margin-top:5px;padding:5px 0 0;}
@@ -221,10 +235,12 @@
 
   /* drive card dropdown menu */
   .drive-menu-wrap{position:relative;}
-  .drive-dropdown{position:absolute;top:24px;right:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.1);z-index:100;min-width:150px;padding:4px;display:none;}
-  .drive-dropdown.open{display:block;}
+  .drive-dropdown{position:absolute;top:24px;right:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.1);z-index:100;min-width:155px;padding:4px;display:none;}
+  .drive-dropdown.open{display:block;animation:fadeUp .15s ease both;}
   .drive-dd-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;font-size:12px;font-weight:500;color:var(--dark);cursor:pointer;transition:background .12s;}
   .drive-dd-item:hover{background:var(--bg);}
+  .drive-dd-item.danger-item{color:var(--danger);}
+  .drive-dd-item.danger-item:hover{background:rgba(220,38,38,.06);}
 
   /* inline rename input inside card */
   .drive-name-input{font-size:12px;font-weight:700;color:var(--dark);background:transparent;border:none;border-bottom:1.5px solid #bbb;outline:none;width:100%;font-family:'Montserrat',sans-serif;padding:1px 0;}
@@ -243,13 +259,56 @@
   .shootday-overlay iframe{flex:1;border:none;width:100%;height:100%;}
 
   @media(max-width:1100px){.main-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:repeat(2,1fr);}}
-  @media(max-width:768px){.sidebar{display:none;}.stats-row{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:768px){
+    .hamburger{display:flex !important;}
+    .sidebar{position:fixed;left:calc(-1 * var(--sidebar-w));top:0;height:100%;z-index:200;transition:left .28s cubic-bezier(.23,1,.32,1);}
+    .sidebar.mobile-open{left:0;}
+    .stats-row{grid-template-columns:repeat(2,1fr);}
+    .search-box{width:auto;flex:1;min-width:0;}
+    .shootday-overlay{inset:0;}
+    .content{padding:16px;}
+    .topbar{padding:12px 16px;gap:8px;}
+  }
+  @media(max-width:480px){
+    .modal{padding:20px;}
+    .drives-grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));}
+    .main-grid{grid-template-columns:1fr;}
+  }
+
+  /* Mobile sidebar overlay */
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99;backdrop-filter:blur(2px);cursor:pointer;}
+
+  /* Skeleton loading */
+  @keyframes shimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+  .skeleton-card{background:#fff;border:1.5px solid var(--border);border-radius:13px;padding:14px;}
+  .skeleton-line{border-radius:4px;background:linear-gradient(90deg,#f0f0ee 25%,#e8e8e6 50%,#f0f0ee 75%);background-size:200% 100%;animation:shimmer 1.4s ease-in-out infinite;}
+
+  /* Custom delete dialog */
+  .delete-overlay{position:fixed;inset:0;z-index:600;display:none;align-items:center;justify-content:center;}
+  .delete-overlay.active{display:flex;}
+  .delete-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);}
+  .delete-dialog{background:#fff;border-radius:16px;padding:28px;width:320px;text-align:center;position:relative;z-index:1;animation:scaleIn .25s ease;}
+  .delete-icon{width:42px;height:42px;background:#fef2f2;border-radius:11px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+  .delete-dialog h3{font-size:15px;font-weight:700;margin-bottom:5px;}
+  .delete-dialog p{font-size:12px;color:#888;margin-bottom:20px;line-height:1.5;}
+  .delete-btns{display:flex;gap:8px;}
+  .btn-del-cancel{flex:1;padding:10px;background:#f5f5f5;border:none;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:#666;transition:background .15s;}
+  .btn-del-cancel:hover{background:#eee;}
+  .btn-del-confirm{flex:1;padding:10px;background:#dc2626;border:none;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:#fff;transition:background .15s;}
+  .btn-del-confirm:hover{background:#b91c1c;}
+
+  /* Stat card hover */
+  .stat-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;}
+  .stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06);}
 </style>
 </head>
 <body>
 
+<!-- Mobile sidebar overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
 <!-- SIDEBAR -->
-<aside class="sidebar">
+<aside class="sidebar" id="mainSidebar">
   <div class="sidebar-header">
     <div class="logo-mark">
       <div class="logo-icon">
@@ -328,6 +387,11 @@
 <!-- MAIN -->
 <main class="main">
   <div class="topbar">
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Toggle navigation">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
     <div class="search-box">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="searchInput" placeholder="Search drives by name or location..." oninput="onSearch(this.value)"/>
@@ -335,7 +399,7 @@
     <div class="topbar-right">
       <div class="badge-cleanup" onclick="openLogModal()">
         <div class="blink"></div>
-        Log today's cleanup
+        <span>Log today's cleanup</span>
       </div>
       <button class="btn-add" onclick="openAddModal()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -383,7 +447,9 @@
           </div>
         </div>
         <div class="drives-grid" id="drivesGrid">
-          <div class="empty-state"><div class="big-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><rect x="2" y="6" width="20" height="12" rx="3"/><circle cx="18" cy="12" r="1.5" fill="#ccc"/></svg></div><strong>Loading drives...</strong></div>
+          <div class="skeleton-card"><div class="skeleton-line" style="height:12px;width:50%;margin-bottom:12px"></div><div class="skeleton-line" style="height:52px;margin-bottom:12px"></div><div class="skeleton-line" style="height:10px;width:70%;margin-bottom:8px"></div><div class="skeleton-line" style="height:5px"></div></div>
+          <div class="skeleton-card"><div class="skeleton-line" style="height:12px;width:55%;margin-bottom:12px"></div><div class="skeleton-line" style="height:52px;margin-bottom:12px"></div><div class="skeleton-line" style="height:10px;width:65%;margin-bottom:8px"></div><div class="skeleton-line" style="height:5px"></div></div>
+          <div class="skeleton-card"><div class="skeleton-line" style="height:12px;width:60%;margin-bottom:12px"></div><div class="skeleton-line" style="height:52px;margin-bottom:12px"></div><div class="skeleton-line" style="height:10px;width:75%;margin-bottom:8px"></div><div class="skeleton-line" style="height:5px"></div></div>
         </div>
       </div>
 
@@ -393,6 +459,7 @@
           <div class="today-tag"><div class="blink"></div> Today's Drive</div>
           <div class="today-drive-name" id="todayName">No drive assigned</div>
           <div class="today-drive-meta" id="todayMeta">Click ⋯ on any drive card to assign it</div>
+          <div class="today-time" id="todayTime"></div>
           <div class="today-prog-row"><span>Storage usage</span><span id="todayPct">—</span></div>
           <div class="today-prog-bar"><div class="today-prog-fill" id="todayFill" style="width:0%"></div></div>
           <div class="today-actions">
@@ -502,7 +569,44 @@
     <div class="detail-grid" id="detailGrid"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('detailModal')" style="flex:1">Close</button>
+      <button class="btn-edit-drive" id="editDriveBtn" onclick="openEditDriveModal()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit
+      </button>
       <button class="btn-primary" id="assignTodayBtn" onclick="assignFromDetail()">Assign for Today</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT DRIVE MODAL -->
+<div class="modal-overlay" id="editDriveModal">
+  <div class="modal">
+    <div class="modal-title">Edit Drive</div>
+    <div class="modal-sub" id="editDriveSub"></div>
+    <div class="modal-field"><label>Drive Name</label><input type="text" id="eName" placeholder="Drive name"/></div>
+    <div class="modal-row">
+      <div class="modal-field"><label>Drive Type</label>
+        <select id="eType"><option value="HDD">HDD (Hard Disk)</option><option value="SSD">SSD (Solid State)</option></select>
+      </div>
+      <div class="modal-field"><label>Total Capacity (GB)</label><input type="number" id="eCap" min="1"/></div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field"><label>Used Space (GB)</label><input type="number" id="eUsed" min="0"/></div>
+      <div class="modal-field"><label>Physical Location</label><input type="text" id="eLoc"/></div>
+    </div>
+    <div class="modal-field"><label>Primary Folder</label>
+      <select id="eFolder">
+        <option value="_ACTIVE">_ACTIVE — Current work</option>
+        <option value="_ARCHIVE">_ARCHIVE — Long-term storage</option>
+        <option value="_INBOX">_INBOX — To be sorted</option>
+        <option value="_PERSONAL">_PERSONAL — Personal files</option>
+        <option value="Mixed">Mixed / Multiple</option>
+      </select>
+    </div>
+    <div class="modal-field"><label>Notes</label><input type="text" id="eNotes" placeholder="What's on this drive?"/></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('editDriveModal')">Cancel</button>
+      <button class="btn-primary" id="saveEditBtn" onclick="saveEditDrive()">Save Changes</button>
     </div>
   </div>
 </div>
@@ -523,6 +627,22 @@
   </div>
 </div>
 
+<!-- DELETE CONFIRM DIALOG -->
+<div class="delete-overlay" id="deleteOverlay">
+  <div class="delete-backdrop" onclick="cancelDelete()"></div>
+  <div class="delete-dialog">
+    <div class="delete-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+    </div>
+    <h3 id="deleteDialogTitle">Delete drive?</h3>
+    <p id="deleteDialogMsg">This cannot be undone.</p>
+    <div class="delete-btns">
+      <button class="btn-del-cancel" onclick="cancelDelete()">Cancel</button>
+      <button class="btn-del-confirm" id="deleteConfirmBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -530,7 +650,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, doc, addDoc, getDocs, updateDoc,
+  getFirestore, collection, doc, addDoc, getDocs, updateDoc, deleteDoc,
   query, where, orderBy, serverTimestamp, limit
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -626,6 +746,16 @@ function getPct(d) {
   return 0;
 }
 
+// ── HELPERS ──
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function highlight(text, q) {
+  if (!q) return escapeHtml(text);
+  const safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return escapeHtml(text).replace(new RegExp(safe, 'gi'), m => `<mark class="sh">${m}</mark>`);
+}
+
 // ── RENDER DRIVES ──
 function getFilteredDrives() {
   let list = [...allDrives];
@@ -656,8 +786,9 @@ window.renderDrives = function() {
   }
 
   if (drives.length === 0) {
-    const msg = allDrives.length === 0
-      ? '<strong>No drives yet</strong><span>Click Add Drive to register your first drive.</span>'
+    const isNoData = allDrives.length === 0;
+    const msg = isNoData
+      ? '<strong>No drives yet</strong><span>Register your first drive to get started.</span><button class="btn-empty" onclick="openAddModal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Your First Drive</button>'
       : '<strong>No drives match this filter</strong><span>Try clearing the search or changing the filter.</span>';
     grid.innerHTML = `<div class="empty-state"><div class="big-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><rect x="2" y="6" width="20" height="12" rx="3"/><circle cx="18" cy="12" r="1.5" fill="#ccc"/></svg></div>${msg}</div>`;
     return;
@@ -671,6 +802,8 @@ window.renderDrives = function() {
     const isToday = drive.todayDate === today;
     const isDanger = pct >= 85;
     const icon = drive.type === 'SSD' ? ssdSVG() : hddSVG();
+    const nameHtml = highlight(drive.name, searchQ);
+    const locHtml  = highlight(drive.location || 'No location set', searchQ);
 
     return `<div class="drive-card ${isDanger?'is-danger':''} ${isToday?'is-today':''}" onclick="openDetail('${drive.id}')">
       <div class="drive-card-top">
@@ -679,7 +812,7 @@ window.renderDrives = function() {
           ${isToday ? '<span class="badge badge-today">TODAY</span>' : ''}
         </div>
         <div class="drive-menu-wrap" onclick="event.stopPropagation()">
-          <button class="drive-menu" title="Options" onclick="toggleDriveMenu('${drive.id}')">⋯</button>
+          <button class="drive-menu" title="Options" onclick="toggleDriveMenu('${drive.id}')">&#8943;</button>
           <div class="drive-dropdown" id="ddmenu-${drive.id}">
             <div class="drive-dd-item" onclick="startRename('${drive.id}')">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -687,21 +820,33 @@ window.renderDrives = function() {
             </div>
             <div class="drive-dd-item" onclick="assignToday('${drive.id}');closeAllMenus()">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              ${isToday ? '✓ Assigned Today' : 'Assign for Today'}
+              ${isToday ? '&#10003; Assigned Today' : 'Assign for Today'}
+            </div>
+            <div class="drive-dd-item danger-item" onclick="confirmDeleteDrive('${drive.id}');closeAllMenus()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+              Delete Drive
             </div>
           </div>
         </div>
       </div>
       <div class="drive-icon-wrap">${icon}</div>
-      <div class="drive-name" id="dname-${drive.id}" title="${drive.name}">${drive.name}</div>
-      <div class="drive-loc">${drive.location || 'No location set'}</div>
-      <div class="fill-bar-bg"><div class="fill-bar ${fillClass}" style="width:${Math.min(pct,100)}%"></div></div>
+      <div class="drive-name" id="dname-${drive.id}" title="${escapeHtml(drive.name)}">${nameHtml}</div>
+      <div class="drive-loc">${locHtml}</div>
+      <div class="fill-bar-bg"><div class="fill-bar ${fillClass}" id="bar-${drive.id}" style="width:0%"></div></div>
       <div class="fill-nums">
         <span>${drive.used||0} / ${drive.capacity||0} GB</span>
         <span class="fill-pct ${pctClass}">${pct}%</span>
       </div>
     </div>`;
   }).join('');
+
+  // Animate fill bars after paint
+  requestAnimationFrame(() => {
+    drives.forEach(drive => {
+      const bar = document.getElementById('bar-' + drive.id);
+      if (bar) setTimeout(() => { bar.style.width = Math.min(getPct(drive), 100) + '%'; }, 60);
+    });
+  });
 };
 
 function hddSVG() {
@@ -740,17 +885,20 @@ function ssdSVG() {
 function renderTodayCard() {
   const today = new Date().toDateString();
   const d = allDrives.find(x => x.todayDate === today);
+  const timeEl = document.getElementById('todayTime');
   if (d) {
     const pct = getPct(d);
     document.getElementById('todayName').textContent = d.name;
     document.getElementById('todayMeta').textContent = `${d.type} · ${d.location||'No location'} · ${d.folder||''}`;
     document.getElementById('todayPct').textContent = `${pct}%`;
     document.getElementById('todayFill').style.width = `${Math.min(pct,100)}%`;
+    if (timeEl) timeEl.textContent = 'Assigned today — cleanup pending';
   } else {
     document.getElementById('todayName').textContent = 'No drive assigned';
     document.getElementById('todayMeta').textContent = 'Click ⋯ on any drive card to assign it for today';
     document.getElementById('todayPct').textContent = '—';
     document.getElementById('todayFill').style.width = '0%';
+    if (timeEl) timeEl.textContent = '';
   }
 }
 
@@ -786,12 +934,27 @@ function renderLogs() {
 
 // ── STATS ──
 function updateStats() {
-  document.getElementById('stHDD').textContent = allDrives.filter(d=>d.type==='HDD').length;
-  document.getElementById('stSSD').textContent = allDrives.filter(d=>d.type==='SSD').length;
-  document.getElementById('stDanger').textContent = allDrives.filter(d=>getPct(d)>=85).length;
+  animateCounter('stHDD',    allDrives.filter(d=>d.type==='HDD').length);
+  animateCounter('stSSD',    allDrives.filter(d=>d.type==='SSD').length);
+  animateCounter('stDanger', allDrives.filter(d=>getPct(d)>=85).length);
   const freed = allLogs.reduce((s,l)=>s+(Number(l.gbFreed)||0),0);
-  document.getElementById('stFreed').textContent = freed;
-  document.getElementById('streakNum').textContent = calcStreak();
+  animateCounter('stFreed',  freed);
+  animateCounter('streakNum', calcStreak());
+}
+
+function animateCounter(id, target) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const start = parseInt(el.textContent) || 0;
+  if (start === target) { el.textContent = target; return; }
+  const duration = 600, startTime = performance.now();
+  function step(now) {
+    const p = Math.min((now - startTime) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(start + (target - start) * ease);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
 }
 
 function calcStreak() {
@@ -814,7 +977,7 @@ function updateSidebar() {
   const used = allDrives.reduce((s,d)=>s+(Number(d.used)||0),0);
   const free = total - used;
   const pct = total > 0 ? Math.round((used/total)*100) : 0;
-  const fmt = gb => gb >= 1000 ? (gb/1000).toFixed(1)+' TB' : gb+' GB';
+  const fmt = gb => gb >= 1000 ? parseFloat((gb/1000).toFixed(2))+' TB' : parseFloat(gb.toFixed(2))+' GB';
   document.getElementById('sidebarCap').textContent = fmt(total) || '—';
   document.getElementById('sidebarUsed').textContent = fmt(used)+' used';
   document.getElementById('sidebarFree').textContent = fmt(free)+' free';
@@ -882,17 +1045,86 @@ window.openDetail = function(driveId) {
     <div class="detail-item"><div class="detail-item-label">Free Space</div><div class="detail-item-value">${(d.capacity||0)-(d.used||0)} GB</div></div>
     <div class="detail-item" style="grid-column:1/-1">
       <div class="detail-item-label">Usage — ${pct}%</div>
-      <div class="detail-fill-bar"><div class="detail-fill ${fillClass}" style="width:${Math.min(pct,100)}%"></div></div>
+      <div class="detail-fill-bar"><div class="detail-fill ${fillClass}" id="detailFillBar" style="width:0%"></div></div>
     </div>
     <div class="detail-item"><div class="detail-item-label">Location</div><div class="detail-item-value" style="font-size:13px">${d.location||'—'}</div></div>
     <div class="detail-item"><div class="detail-item-label">Folder</div><div class="detail-item-value" style="font-size:13px">${d.folder||'—'}</div></div>
-    ${d.notes ? `<div class="detail-item" style="grid-column:1/-1"><div class="detail-item-label">Notes</div><div class="detail-item-value" style="font-size:13px;font-weight:400">${d.notes}</div></div>` : ''}
+    ${d.notes ? `<div class="detail-item" style="grid-column:1/-1"><div class="detail-item-label">Notes</div><div class="detail-item-value" style="font-size:13px;font-weight:400">${escapeHtml(d.notes)}</div></div>` : ''}
   `;
   const today = new Date().toDateString();
   document.getElementById('assignTodayBtn').textContent =
     d.todayDate === today ? '✓ Assigned Today' : 'Assign for Today';
   openModal('detailModal');
+  // Animate detail fill bar
+  setTimeout(() => { const b = document.getElementById('detailFillBar'); if (b) b.style.width = Math.min(pct,100)+'%'; }, 100);
 };
+
+// ── EDIT DRIVE ──
+window.openEditDriveModal = function() {
+  const d = allDrives.find(x => x.id === detailDriveId);
+  if (!d) return;
+  document.getElementById('editDriveSub').textContent = 'Editing: ' + d.name;
+  document.getElementById('eName').value   = d.name     || '';
+  document.getElementById('eType').value   = d.type     || 'HDD';
+  document.getElementById('eCap').value    = d.capacity || '';
+  document.getElementById('eUsed').value   = d.used     || '';
+  document.getElementById('eLoc').value    = d.location || '';
+  document.getElementById('eFolder').value = d.folder   || '_ACTIVE';
+  document.getElementById('eNotes').value  = d.notes    || '';
+  closeModal('detailModal');
+  openModal('editDriveModal');
+};
+
+window.saveEditDrive = async function() {
+  const btn = document.getElementById('saveEditBtn');
+  const name     = document.getElementById('eName').value.trim();
+  const type     = document.getElementById('eType').value;
+  const capacity = Number(document.getElementById('eCap').value);
+  const used     = Math.min(Number(document.getElementById('eUsed').value)||0, capacity);
+  const location = document.getElementById('eLoc').value.trim();
+  const folder   = document.getElementById('eFolder').value;
+  const notes    = document.getElementById('eNotes').value.trim();
+  if (!name)              { showToast('Please enter a drive name');     return; }
+  if (!capacity || capacity <= 0) { showToast('Please enter a valid capacity'); return; }
+  btn.disabled = true; btn.textContent = 'Saving...';
+  try {
+    const fillPct = capacity > 0 ? Math.round((used/capacity)*100) : 0;
+    await updateDoc(doc(db,'drives',detailDriveId), { name, type, capacity, used, fillPct, location, folder, notes });
+    closeModal('editDriveModal');
+    await refreshAll();
+    showToast('✅ Drive updated');
+  } catch(e) {
+    showToast('Error: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Changes';
+  }
+};
+
+// ── DELETE DRIVE ──
+let _pendingDeleteId = null;
+window.confirmDeleteDrive = function(driveId) {
+  const d = allDrives.find(x => x.id === driveId);
+  if (!d) return;
+  _pendingDeleteId = driveId;
+  document.getElementById('deleteDialogTitle').textContent = 'Delete "' + d.name + '"?';
+  document.getElementById('deleteDialogMsg').textContent = 'This drive will be permanently removed. This cannot be undone.';
+  document.getElementById('deleteConfirmBtn').onclick = execDeleteDrive;
+  document.getElementById('deleteOverlay').classList.add('active');
+};
+window.cancelDelete = function() {
+  _pendingDeleteId = null;
+  document.getElementById('deleteOverlay').classList.remove('active');
+};
+async function execDeleteDrive() {
+  if (!_pendingDeleteId) return;
+  const id = _pendingDeleteId; _pendingDeleteId = null;
+  document.getElementById('deleteOverlay').classList.remove('active');
+  try {
+    await deleteDoc(doc(db,'drives', id));
+    await refreshAll();
+    showToast('🗑️ Drive deleted');
+  } catch(e) { showToast('Delete failed: ' + e.message); }
+}
 
 // ── SAVE DRIVE ──
 window.saveDrive = async function() {
@@ -996,6 +1228,7 @@ window.setView = function(el, view) {
   document.getElementById('drivesTitle').textContent = titles[view]||'Drives';
   document.getElementById('filterTabs').style.display = view==='cleanup'?'none':'flex';
   renderDrives();
+  closeSidebar();
 };
 
 window.setFolder = function(navEl, folder) {
@@ -1013,6 +1246,7 @@ window.setFolder = function(navEl, folder) {
     document.getElementById('drivesTitle').textContent = 'Drive Registry';
   }
   renderDrives();
+  closeSidebar();
 };
 
 function clearFolderHighlights() {
@@ -1043,16 +1277,25 @@ window.closeAllMenus = function() {
   document.querySelectorAll('.drive-dropdown.open').forEach(m => m.classList.remove('open'));
 };
 
-// Close menus when clicking anywhere outside
-document.addEventListener('click', () => closeAllMenus());
+// Close menus when clicking outside a drive-menu-wrap
+document.addEventListener('click', e => {
+  if (!e.target.closest('.drive-menu-wrap')) closeAllMenus();
+});
 
 window.startRename = function(driveId) {
   closeAllMenus();
   const nameEl = document.getElementById('dname-'+driveId);
   if (!nameEl) return;
   const currentName = nameEl.textContent.trim();
-  nameEl.innerHTML = `<input class="drive-name-input" id="rename-input-${driveId}" value="${currentName}" maxlength="60" onclick="event.stopPropagation()"/>`;
-  const input = document.getElementById('rename-input-'+driveId);
+  // Safe DOM creation instead of innerHTML to avoid injection
+  nameEl.innerHTML = '';
+  const input = document.createElement('input');
+  input.className = 'drive-name-input';
+  input.id = 'rename-input-' + driveId;
+  input.value = currentName;
+  input.maxLength = 60;
+  input.addEventListener('click', e => e.stopPropagation());
+  nameEl.appendChild(input);
   input.focus();
   input.select();
 
@@ -1091,11 +1334,13 @@ window.confirmSignOut = async function() {
 };
 
 // ── TOAST ──
+let _toastTimer = null;
 function showToast(msg) {
   const t = document.getElementById('toast');
+  if (_toastTimer) clearTimeout(_toastTimer);
   t.innerHTML = '<span class="toast-dot"></span>' + msg;
   t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2800);
+  _toastTimer = setTimeout(() => { t.classList.remove('show'); _toastTimer = null; }, 2800);
 }
 
 // ── OVERLAY CLICK TO CLOSE ──
@@ -1106,6 +1351,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+// ── MOBILE SIDEBAR ──
+window.toggleSidebar = function() {
+  const sidebar = document.getElementById('mainSidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const isOpen  = sidebar.classList.contains('mobile-open');
+  if (isOpen) { sidebar.classList.remove('mobile-open'); overlay.style.display = 'none'; }
+  else        { sidebar.classList.add('mobile-open');    overlay.style.display = 'block'; }
+};
+window.closeSidebar = function() {
+  document.getElementById('mainSidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').style.display = 'none';
+};
 </script>
 <!-- SHOOT DAY OVERLAY -->
 <div class="shootday-overlay" id="shootdayOverlay">

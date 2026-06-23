@@ -165,6 +165,47 @@
     .sidebar{display:none;}
     .delivery-grid{grid-template-columns:repeat(2,1fr);}
   }
+  @media(max-width:768px){
+    .hamburger{display:flex !important;}
+    .sidebar{position:fixed;left:-236px;top:0;height:100%;z-index:200;display:flex !important;flex-direction:column;transition:left .28s cubic-bezier(.23,1,.32,1);}
+    .sidebar.mobile-open{left:0;}
+    .content{padding:16px;}
+    .topbar{padding:12px 16px;}
+    .form-row.cols-3{grid-template-columns:1fr 1fr;}
+    .delivery-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media(max-width:480px){
+    .form-row.cols-2,.form-row.cols-3{grid-template-columns:1fr;}
+    .delivery-grid{grid-template-columns:1fr 1fr;}
+  }
+
+  /* Hamburger */
+  .hamburger{display:none;align-items:center;justify-content:center;width:38px;height:38px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;flex-shrink:0;transition:background .15s;}
+  .hamburger:hover{background:#e8e8e8;}
+
+  /* Mobile sidebar overlay */
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99;backdrop-filter:blur(2px);cursor:pointer;}
+
+  /* Custom delete dialog */
+  .del-overlay{position:fixed;inset:0;z-index:600;display:none;align-items:center;justify-content:center;}
+  .del-overlay.active{display:flex;}
+  .del-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);}
+  .del-dialog{background:#fff;border-radius:16px;padding:28px;width:320px;text-align:center;position:relative;z-index:1;animation:scaleIn .25s ease;}
+  .del-icon{width:42px;height:42px;background:#fef2f2;border-radius:11px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+  .del-dialog h3{font-size:15px;font-weight:700;margin-bottom:5px;color:#111;}
+  .del-dialog p{font-size:12px;color:#888;margin-bottom:20px;line-height:1.5;}
+  .del-btns{display:flex;gap:8px;}
+  .btn-delc{flex:1;padding:10px;background:#f5f5f5;border:none;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:#666;transition:background .15s;}
+  .btn-delc:hover{background:#eee;}
+  .btn-delx{flex:1;padding:10px;background:#dc2626;border:none;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:#fff;transition:background .15s;}
+  .btn-delx:hover{background:#b91c1c;}
+
+  /* Security warning */
+  .field-warn{font-size:10px;color:#b7791f;background:#fef9ee;border:1px solid #f0d080;border-radius:6px;padding:5px 10px;margin-top:4px;display:flex;align-items:center;gap:5px;line-height:1.4;}
+
+  /* Danger drive-dd-item */
+  .drive-dd-item.danger-item{color:#c0392b;}
+  .drive-dd-item.danger-item:hover{background:rgba(220,38,38,.06);}
   @media print{
     .sidebar,.topbar,.form-actions,.records-header,.records-grid,.empty-records,.toast{display:none!important;}
     .content{padding:0;}
@@ -179,8 +220,11 @@
 </head>
 <body>
 
+<!-- Mobile sidebar overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
 <!-- SIDEBAR -->
-<aside class="sidebar">
+<aside class="sidebar" id="shootSidebar">
   <div class="sidebar-header">
     <div class="logo-mark">
       <div class="logo-icon">
@@ -261,6 +305,11 @@
 <!-- MAIN -->
 <main class="main">
   <div class="topbar">
+    <button class="hamburger" onclick="toggleMobileSidebar()" aria-label="Toggle navigation">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
     <div class="topbar-title">Shoot Day Records</div>
     <div class="topbar-right">
       <div class="storage-warn" id="storageWarnBadge" style="display:none;">
@@ -328,7 +377,14 @@
         <div class="form-section">
           <div class="form-section-title">Storage &amp; Management</div>
           <div class="form-row cols-2">
-            <div class="field"><label>Managed By</label><input type="text" id="f_managedBy" placeholder="Your name"/></div>
+            <div class="form-field">
+              <label>Gmail</label>
+              <input type="text" id="f_gmail" placeholder="Gmail account"/>
+              <div class="field-warn">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 19h20L12 2z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>
+                Store only non-sensitive info. Avoid real passwords.
+              </div>
+            </div>
             <div class="field"><label>Date Managed</label><input type="date" id="f_managedDate"/></div>
           </div>
           <div class="form-row cols-2">
@@ -496,7 +552,7 @@ async function loadDrivesForSidebar() {
     const used   = drives.reduce((s,d)=>s+(Number(d.used)||0),0);
     const free   = total - used;
     const pct    = total > 0 ? Math.round((used/total)*100) : 0;
-    const fmt    = gb => gb >= 1000 ? (gb/1000).toFixed(1)+' TB' : gb+' GB';
+    const fmt    = gb => gb >= 1000 ? parseFloat((gb/1000).toFixed(2))+' TB' : parseFloat(gb.toFixed(2))+' GB';
     document.getElementById('sidebarCap').textContent  = fmt(total) || '—';
     document.getElementById('sidebarUsed').textContent = fmt(used)+' used';
     document.getElementById('sidebarFree').textContent = fmt(free)+' free';
@@ -698,15 +754,36 @@ window.saveRecord = async function() {
 
 window.deleteRecord = async function(e, id) {
   e.stopPropagation();
-  if (!confirm('Delete this shoot day record? This cannot be undone.')) return;
-  try {
-    await deleteDoc(doc(db,'shootDayRecords',id));
-    if (activeRecId === id) { activeRecId = null; newRecord(); }
-    await loadRecords();
-    showToast('Record deleted');
-  } catch(err) {
-    showToast('Delete failed: ' + err.message);
-  }
+  const rec = allRecords.find(r => r.id === id);
+  document.getElementById('delDialogMsg').textContent =
+    '"' + (rec?.clientName || 'This record') + '" will be permanently removed. This cannot be undone.';
+  document.getElementById('delConfirmBtn').onclick = async () => {
+    document.getElementById('delOverlay').classList.remove('active');
+    try {
+      await deleteDoc(doc(db,'shootDayRecords',id));
+      if (activeRecId === id) { activeRecId = null; newRecord(); }
+      await loadRecords();
+      showToast('Record deleted');
+    } catch(err) {
+      showToast('Delete failed: ' + err.message);
+    }
+  };
+  document.getElementById('delOverlay').classList.add('active');
+};
+window.cancelDelRecord = function() {
+  document.getElementById('delOverlay').classList.remove('active');
+};
+
+window.toggleMobileSidebar = function() {
+  const sidebar = document.getElementById('shootSidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const isOpen  = sidebar.classList.contains('mobile-open');
+  if (isOpen) { sidebar.classList.remove('mobile-open'); overlay.style.display = 'none'; }
+  else        { sidebar.classList.add('mobile-open');    overlay.style.display = 'block'; }
+};
+window.closeMobileSidebar = function() {
+  document.getElementById('shootSidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').style.display = 'none';
 };
 
 window.toggleCheck = function(itemEl, cbId, e) {
@@ -740,5 +817,21 @@ function showToast(msg) {
   });
 })();
 </script>
+
+<!-- CUSTOM DELETE DIALOG -->
+<div class="del-overlay" id="delOverlay">
+  <div class="del-backdrop" onclick="cancelDelRecord()"></div>
+  <div class="del-dialog">
+    <div class="del-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+    </div>
+    <h3>Delete record?</h3>
+    <p id="delDialogMsg">This record will be permanently removed.</p>
+    <div class="del-btns">
+      <button class="btn-delc" onclick="cancelDelRecord()">Cancel</button>
+      <button class="btn-delx" id="delConfirmBtn">Delete</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
