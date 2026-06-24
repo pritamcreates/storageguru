@@ -852,7 +852,10 @@ window.newRecord = function() {
 window.saveRecord = async function() {
   const btn  = document.getElementById('saveBtn');
   const data = collectForm();
-  if (!data.clientName) { showToast('⚠️ Client name is required'); return; }
+  if (!data.clientName) { showToast('\u26a0\ufe0f Client name is required'); return; }
+
+  // Capture previous state BEFORE saving (needed for delta calc on update)
+  const prevData = activeRecId ? allRecords.find(r => r.id === activeRecId) : null;
 
   btn.disabled = true;
   const origHTML = btn.innerHTML;
@@ -862,14 +865,25 @@ window.saveRecord = async function() {
     const payload = { ...data, uid: currentUser.uid };
     if (activeRecId) {
       await updateDoc(doc(db,'shootDayRecords',activeRecId), { ...payload, updatedAt: serverTimestamp() });
-      showToast('✅ Record updated');
     } else {
       const ref = await addDoc(collection(db,'shootDayRecords'), { ...payload, createdAt: serverTimestamp() });
       activeRecId = ref.id;
-      showToast('✅ Record saved');
     }
+
+    // Sync HDDs to Drive Registry
+    const syncResult = await syncDrivesFromShoot(data, prevData);
     await loadRecords();
     btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Update Record';
+
+    if (syncResult.created > 0 && syncResult.updated > 0)
+      showToast(`\u2705 Saved \u2014 ${syncResult.created} drive${syncResult.created>1?'s':''} added, ${syncResult.updated} updated in Drive Registry`);
+    else if (syncResult.created > 0)
+      showToast(`\u2705 Saved \u2014 ${syncResult.created} new drive${syncResult.created>1?'s':''} added to Drive Registry`);
+    else if (syncResult.updated > 0)
+      showToast(`\u2705 Saved \u2014 ${syncResult.updated} drive${syncResult.updated>1?'s':''} updated in Drive Registry`);
+    else
+      showToast(prevData ? '\u2705 Record updated' : '\u2705 Record saved');
+
   } catch(e) {
     showToast('Error: ' + e.message);
     btn.innerHTML = origHTML;
@@ -877,6 +891,87 @@ window.saveRecord = async function() {
     btn.disabled = false;
   }
 };
+
+// ── DRIVE SYNC HELPERS ──────────────────────────────────────────
+
+function calcShootGB(team) {
+  return parseFloat(((team || []).reduce((s, m) => s + (parseFloat(m.gb) || 0), 0)).toFixed(2));
+}
+
+async function syncDrivesFromShoot(newData, prevData) {
+  const result = { created: 0, updated: 0 };
+  const newGB  = calcShootGB(newData.team);
+  const prevGB = prevData ? calcShootGB(prevData.team) : 0;
+
+  // Fetch current user drives
+  const snap   = await getDocs(query(collection(db,'drives'), where('uid','==',currentUser.uid)));
+  const drives = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  const pairs = [
+    { newName: newData.hddSingle, prevName: prevData?.hddSingle },
+    { newName: newData.hddDouble, prevName: prevData?.hddDouble },
+  ];
+
+  for (const { newName, prevName } of pairs) {
+    if (!newName && !prevName) continue;
+
+    const nameChanged = prevName && prevName.toLowerCase() !== (newName || '').toLowerCase();
+
+    if (nameChanged) {
+      // Revert usage from old drive
+      const oldDrive = drives.find(d => d.name.toLowerCase() === prevName.toLowerCase());
+      if (oldDrive) {
+        const reverted = parseFloat(Math.max(0, (oldDrive.used || 0) - prevGB).toFixed(2));
+        const fillPct  = oldDrive.capacity > 0 ? Math.round((reverted / oldDrive.capacity) * 100) : 0;
+        await updateDoc(doc(db, 'drives', oldDrive.id), { used: reverted, fillPct });
+        result.updated++;
+        // Refresh local copy so same drive isn't double-counted below
+        oldDrive.used = reverted;
+      }
+      // Apply full new amount to new drive name
+      if (newName && newGB > 0) {
+        const r = await applyGBToDrive(drives, newName, newGB, newData.clientName);
+        result[r]++;
+      }
+    } else if (newName) {
+      // Same drive (or brand new record) — apply delta
+      const delta = newGB - prevGB;
+      if (delta !== 0 || !prevData) {
+        const r = await applyGBToDrive(drives, newName, prevData ? delta : newGB, newData.clientName);
+        result[r]++;
+      }
+    }
+  }
+  return result;
+}
+
+async function applyGBToDrive(drives, driveName, gbDelta, eventName) {
+  const match = drives.find(d => d.name.toLowerCase() === driveName.toLowerCase());
+  if (match) {
+    const newUsed = parseFloat(Math.max(0, (match.used || 0) + gbDelta).toFixed(2));
+    const fillPct = match.capacity > 0 ? Math.round((newUsed / match.capacity) * 100) : 0;
+    await updateDoc(doc(db, 'drives', match.id), { used: newUsed, fillPct });
+    match.used = newUsed; // update local cache so second HDD sees fresh value
+    return 'updated';
+  } else if (gbDelta > 0) {
+    const newDrive = {
+      uid:       currentUser.uid,
+      name:      driveName,
+      type:      'HDD',
+      capacity:  0,
+      used:      parseFloat(gbDelta.toFixed(2)),
+      fillPct:   0,
+      folder:    '_ACTIVE',
+      location:  '',
+      notes:     `Auto-added from Shoot Day: ${eventName || ''}`,
+      createdAt: serverTimestamp(),
+    };
+    const ref = await addDoc(collection(db, 'drives'), newDrive);
+    drives.push({ id: ref.id, ...newDrive }); // add to local cache
+    return 'created';
+  }
+  return 'skipped';
+}
 
 window.deleteRecord = async function(e, id) {
   e.stopPropagation();
