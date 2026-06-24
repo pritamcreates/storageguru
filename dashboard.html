@@ -1389,18 +1389,14 @@ window.closeShootDay = function() {
 window.goToView = function(view, folder) {
   closeShootDay();
   setTimeout(() => {
-    if (view === 'danger') {
-      const el = document.querySelector('.nav-item[onclick*="danger"]');
-      if (el) el.click();
-    } else if (view === 'cleanup') {
-      const el = document.querySelector('.nav-item[onclick*="cleanup"]');
-      if (el) el.click();
-    } else if (folder) {
-      const el = document.querySelector(`.nav-item[data-folder="${folder}"]`);
-      if (el) el.click();
+    if (folder) {
+      // Navigate to a folder filter
+      const navEl = document.querySelector(`.nav-item[data-folder="${folder}"]`);
+      setFolder(navEl || null, folder);
     } else {
-      const el = document.querySelector('.nav-item[data-view="all"]');
-      if (el) el.click();
+      // Navigate to a view (all / danger / cleanup)
+      const navEl = document.querySelector(`.nav-item[data-view="${view}"]`);
+      if (navEl) setView(navEl, view);
     }
   }, 320);
 };
