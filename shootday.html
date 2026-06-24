@@ -942,15 +942,15 @@ function showToast(msg) {
 })();
 
 // Global navigation — works in both iframe and standalone
-function sdGoBack() {
+window.sdGoBack = function() {
   if (window.self !== window.top) {
     try { window.parent.closeShootDay(); }
     catch(e) { window.top.location.href = 'dashboard.html'; }
   } else {
     window.location.href = 'dashboard.html';
   }
-}
-function sdGoTo(view, folder) {
+};
+window.sdGoTo = function(view, folder) {
   if (window.self !== window.top) {
     try {
       if (view === 'dashboard') { window.parent.closeShootDay(); return; }
@@ -963,7 +963,7 @@ function sdGoTo(view, folder) {
   } else {
     window.location.href = 'dashboard.html';
   }
-}
+};
 </script>
 
 <!-- CUSTOM DELETE DIALOG -->
