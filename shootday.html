@@ -494,6 +494,14 @@
           </div>
         </div>
 
+        <div class="form-section">
+          <div class="form-section-title">Notes</div>
+          <div class="field">
+            <label>Event Notes</label>
+            <textarea id="f_notes" rows="5" placeholder="Add any notes, special instructions, reminders, or important details about this event..."></textarea>
+          </div>
+        </div>
+
         <div class="form-actions">
           <button class="btn-new" onclick="newRecord()">Clear</button>
           <button class="btn-print" onclick="window.print()" title="Print this record">
@@ -763,6 +771,7 @@ function collectForm() {
     hddSingle:   document.getElementById('f_hddSingle').value.trim(),
     hddDouble:   document.getElementById('f_hddDouble').value.trim(),
     gmail:       document.getElementById('f_gmail').value.trim(),
+    notes:       document.getElementById('f_notes').value.trim(),
     deliverables: {
       photos: document.getElementById('f_photos').checked,
       videos: document.getElementById('f_videos').checked,
@@ -780,6 +789,8 @@ function populateForm(data) {
   document.getElementById('f_hddSingle').value   = data.hddSingle   || '';
   document.getElementById('f_hddDouble').value   = data.hddDouble   || '';
   document.getElementById('f_gmail').value       = data.gmail       || '';
+
+  document.getElementById('f_notes').value       = data.notes       || '';
 
   (data.team || []).forEach((row, i) => {
     const key = TEAM_KEYS[i];
@@ -822,6 +833,7 @@ window.newRecord = function() {
   document.getElementById('f_eventType').value   = '';
   document.getElementById('f_venue').value       = '';
   document.getElementById('f_managedDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('f_notes').value       = '';
   document.getElementById('f_hddSingle').value   = '';
   document.getElementById('f_hddDouble').value   = '';
   document.getElementById('f_gmail').value       = '';
