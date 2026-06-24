@@ -253,9 +253,6 @@
   /* SHOOT DAY OVERLAY */
   .shootday-overlay{position:fixed;inset:0 0 0 var(--sidebar-w);z-index:300;background:var(--bg);display:none;flex-direction:column;}
   .shootday-overlay.open{display:flex;}
-  .shootday-topbar{display:flex;align-items:center;gap:12px;padding:12px 20px;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;}
-  .btn-back{display:flex;align-items:center;gap:7px;padding:8px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:var(--dark);transition:border-color .2s,background .2s;}
-  .btn-back:hover{border-color:#bbb;background:#efefef;}
   .shootday-overlay iframe{flex:1;border:none;width:100%;height:100%;}
 
   @media(max-width:1100px){.main-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:repeat(2,1fr);}}
@@ -1367,13 +1364,6 @@ window.closeSidebar = function() {
 </script>
 <!-- SHOOT DAY OVERLAY -->
 <div class="shootday-overlay" id="shootdayOverlay">
-  <div class="shootday-topbar">
-    <button class="btn-back" onclick="closeShootDay()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-      Back to Dashboard
-    </button>
-    <span style="font-size:13px;font-weight:700;color:var(--dark);">Shoot Day</span>
-  </div>
   <iframe id="shootdayFrame" src="" title="Shoot Day"></iframe>
 </div>
 
@@ -1393,6 +1383,26 @@ window.closeShootDay = function() {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const dashBtn = document.querySelector('.nav-item[data-view="all"]');
   if (dashBtn) dashBtn.classList.add('active');
+};
+
+// Called from shootday iframe to navigate dashboard
+window.goToView = function(view, folder) {
+  closeShootDay();
+  setTimeout(() => {
+    if (view === 'danger') {
+      const el = document.querySelector('.nav-item[onclick*="danger"]');
+      if (el) el.click();
+    } else if (view === 'cleanup') {
+      const el = document.querySelector('.nav-item[onclick*="cleanup"]');
+      if (el) el.click();
+    } else if (folder) {
+      const el = document.querySelector(`.nav-item[data-folder="${folder}"]`);
+      if (el) el.click();
+    } else {
+      const el = document.querySelector('.nav-item[data-view="all"]');
+      if (el) el.click();
+    }
+  }, 320);
 };
 </script>
 
