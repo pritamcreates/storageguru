@@ -449,7 +449,7 @@
                 <th style="width:110px">Camera</th>
                 <th style="width:68px;text-align:center">Single B.</th>
                 <th style="width:68px;text-align:center">Double B.</th>
-                <th style="width:55px">Files</th>
+                <th style="width:80px">Files</th>
                 <th style="width:90px">Size (GB)</th>
               </tr>
             </thead>
@@ -527,6 +527,37 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Iframe detection + navigation: regular (sync) script so it always runs regardless of Firebase -->
+<script>
+(function() {
+  if (window.self === window.top) return;
+  document.body.classList.add('in-iframe');
+})();
+
+window.sdGoBack = function() {
+  if (window.self !== window.top) {
+    try { window.parent.closeShootDay(); }
+    catch(e) { window.top.location.href = 'dashboard.html'; }
+  } else {
+    window.location.href = 'dashboard.html';
+  }
+};
+window.sdGoTo = function(view, folder) {
+  if (window.self !== window.top) {
+    try {
+      if (view === 'dashboard') { window.parent.closeShootDay(); return; }
+      if (typeof window.parent.goToView === 'function') {
+        window.parent.goToView(view, folder);
+      } else {
+        window.parent.closeShootDay();
+      }
+    } catch(e) { window.top.location.href = 'dashboard.html'; }
+  } else {
+    window.location.href = 'dashboard.html';
+  }
+};
+</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -728,7 +759,6 @@ function collectForm() {
     eventType:   document.getElementById('f_eventType').value.trim(),
     venue:       document.getElementById('f_venue').value.trim(),
     team,
-    managedBy:   document.getElementById('f_managedBy').value.trim(),
     managedDate: document.getElementById('f_managedDate').value,
     hddSingle:   document.getElementById('f_hddSingle').value.trim(),
     hddDouble:   document.getElementById('f_hddDouble').value.trim(),
@@ -746,7 +776,6 @@ function populateForm(data) {
   document.getElementById('f_eventDate').value   = data.eventDate   || '';
   document.getElementById('f_eventType').value   = data.eventType   || '';
   document.getElementById('f_venue').value       = data.venue       || '';
-  document.getElementById('f_managedBy').value   = data.managedBy   || '';
   document.getElementById('f_managedDate').value = data.managedDate || '';
   document.getElementById('f_hddSingle').value   = data.hddSingle   || '';
   document.getElementById('f_hddDouble').value   = data.hddDouble   || '';
@@ -792,7 +821,6 @@ window.newRecord = function() {
   document.getElementById('f_eventDate').value   = new Date().toISOString().split('T')[0];
   document.getElementById('f_eventType').value   = '';
   document.getElementById('f_venue').value       = '';
-  document.getElementById('f_managedBy').value   = '';
   document.getElementById('f_managedDate').value = new Date().toISOString().split('T')[0];
   document.getElementById('f_hddSingle').value   = '';
   document.getElementById('f_hddDouble').value   = '';
@@ -934,36 +962,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// If loaded inside dashboard iframe, hide sidebar and intercept dashboard links
-(function() {
-  const inIframe = window.self !== window.top;
-  if (!inIframe) return;
-  document.body.classList.add('in-iframe');
-})();
 
-// Global navigation — works in both iframe and standalone
-window.sdGoBack = function() {
-  if (window.self !== window.top) {
-    try { window.parent.closeShootDay(); }
-    catch(e) { window.top.location.href = 'dashboard.html'; }
-  } else {
-    window.location.href = 'dashboard.html';
-  }
-};
-window.sdGoTo = function(view, folder) {
-  if (window.self !== window.top) {
-    try {
-      if (view === 'dashboard') { window.parent.closeShootDay(); return; }
-      if (typeof window.parent.goToView === 'function') {
-        window.parent.goToView(view, folder);
-      } else {
-        window.parent.closeShootDay();
-      }
-    } catch(e) { window.top.location.href = 'dashboard.html'; }
-  } else {
-    window.location.href = 'dashboard.html';
-  }
-};
 </script>
 
 <!-- CUSTOM DELETE DIALOG -->
