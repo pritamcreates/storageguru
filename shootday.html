@@ -217,6 +217,20 @@
   }
   .btn-records.active .records-badge{background:rgba(255,255,255,.2);color:#fff;}
 
+  /* Back button (iframe mode only) */
+  .btn-back-dash{
+    display:none;align-items:center;gap:7px;padding:8px 14px;
+    background:var(--bg);border:1.5px solid var(--border);border-radius:8px;
+    font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;
+    cursor:pointer;color:var(--dark);transition:all .2s;white-space:nowrap;
+  }
+  .btn-back-dash:hover{border-color:#bbb;background:#ebebeb;}
+  /* Show sidebar in standalone, hide in iframe */
+  body.in-iframe .sidebar{display:none!important;}
+  body.in-iframe .main{flex:1;}
+  body.in-iframe .hamburger{display:none!important;}
+  body.in-iframe .btn-back-dash{display:flex!important;}
+
   @media(max-width:900px){
     .delivery-grid{grid-template-columns:repeat(2,1fr);}
   }
@@ -302,15 +316,15 @@
   </div>
 
   <nav class="sidebar-nav">
-    <button class="nav-item" onclick="goTo('dashboard')">
+    <button class="nav-item" onclick="sdGoTo('dashboard')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       Dashboard
     </button>
-    <button class="nav-item" onclick="goTo('danger')">
+    <button class="nav-item" onclick="sdGoTo('danger')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 19h20L12 2z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>
       Danger Zone
     </button>
-    <button class="nav-item" onclick="goTo('cleanup')">
+    <button class="nav-item" onclick="sdGoTo('cleanup')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
       Cleanup Log
     </button>
@@ -322,19 +336,19 @@
     </button>
 
     <div class="nav-label">Folders</div>
-    <button class="nav-item" onclick="goTo('folder','_ACTIVE')">
+    <button class="nav-item" onclick="sdGoTo('folder','_ACTIVE')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
       _ACTIVE
     </button>
-    <button class="nav-item" onclick="goTo('folder','_ARCHIVE')">
+    <button class="nav-item" onclick="sdGoTo('folder','_ARCHIVE')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
       _ARCHIVE
     </button>
-    <button class="nav-item" onclick="goTo('folder','_INBOX')">
+    <button class="nav-item" onclick="sdGoTo('folder','_INBOX')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
       _INBOX
     </button>
-    <button class="nav-item" onclick="goTo('folder','_PERSONAL')">
+    <button class="nav-item" onclick="sdGoTo('folder','_PERSONAL')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
       _PERSONAL
     </button>
@@ -364,6 +378,11 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
+    </button>
+    <!-- Back button: only visible when loaded inside dashboard iframe -->
+    <button class="btn-back-dash" id="backDashBtn" onclick="sdGoBack()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Dashboard
     </button>
     <div class="topbar-title">Shoot Day Records</div>
     <div class="topbar-right">
@@ -920,13 +939,31 @@ function showToast(msg) {
   const inIframe = window.self !== window.top;
   if (!inIframe) return;
   document.body.classList.add('in-iframe');
-  document.querySelectorAll('a[href="dashboard.html"], a[href^="dashboard.html"]').forEach(link => {
-    link.addEventListener('click', e => {
-      e.preventDefault();
-      try { window.parent.closeShootDay(); } catch(_) { window.top.location.href = 'dashboard.html'; }
-    });
-  });
 })();
+
+// Global navigation — works in both iframe and standalone
+function sdGoBack() {
+  if (window.self !== window.top) {
+    try { window.parent.closeShootDay(); }
+    catch(e) { window.top.location.href = 'dashboard.html'; }
+  } else {
+    window.location.href = 'dashboard.html';
+  }
+}
+function sdGoTo(view, folder) {
+  if (window.self !== window.top) {
+    try {
+      if (view === 'dashboard') { window.parent.closeShootDay(); return; }
+      if (typeof window.parent.goToView === 'function') {
+        window.parent.goToView(view, folder);
+      } else {
+        window.parent.closeShootDay();
+      }
+    } catch(e) { window.top.location.href = 'dashboard.html'; }
+  } else {
+    window.location.href = 'dashboard.html';
+  }
+}
 </script>
 
 <!-- CUSTOM DELETE DIALOG -->
