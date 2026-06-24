@@ -834,7 +834,7 @@ window.renderDrives = function() {
       <div class="drive-loc">${locHtml}</div>
       <div class="fill-bar-bg"><div class="fill-bar ${fillClass}" id="bar-${drive.id}" style="width:0%"></div></div>
       <div class="fill-nums">
-        <span>${drive.used||0} / ${drive.capacity||0} GB</span>
+        <span>${parseFloat((drive.used||0).toFixed(2))} / ${parseFloat((drive.capacity||0).toFixed(2))} GB</span>
         <span class="fill-pct ${pctClass}">${pct}%</span>
       </div>
     </div>`;
@@ -1040,9 +1040,9 @@ window.openDetail = function(driveId) {
   document.getElementById('detailSub').textContent = `${d.type} · ${d.folder || 'No folder'} · ${d.location || 'No location'}`;
   document.getElementById('detailGrid').innerHTML = `
     <div class="detail-item"><div class="detail-item-label">Type</div><div class="detail-item-value">${d.type}</div></div>
-    <div class="detail-item"><div class="detail-item-label">Total Capacity</div><div class="detail-item-value">${d.capacity} GB</div></div>
-    <div class="detail-item"><div class="detail-item-label">Used Space</div><div class="detail-item-value">${d.used} GB</div></div>
-    <div class="detail-item"><div class="detail-item-label">Free Space</div><div class="detail-item-value">${(d.capacity||0)-(d.used||0)} GB</div></div>
+    <div class="detail-item"><div class="detail-item-label">Total Capacity</div><div class="detail-item-value">${parseFloat((d.capacity||0).toFixed(2))} GB</div></div>
+    <div class="detail-item"><div class="detail-item-label">Used Space</div><div class="detail-item-value">${parseFloat((d.used||0).toFixed(2))} GB</div></div>
+    <div class="detail-item"><div class="detail-item-label">Free Space</div><div class="detail-item-value">${parseFloat(((d.capacity||0)-(d.used||0)).toFixed(2))} GB</div></div>
     <div class="detail-item" style="grid-column:1/-1">
       <div class="detail-item-label">Usage — ${pct}%</div>
       <div class="detail-fill-bar"><div class="detail-fill ${fillClass}" id="detailFillBar" style="width:0%"></div></div>
