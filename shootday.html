@@ -231,6 +231,24 @@
   body.in-iframe .hamburger{display:none!important;}
   body.in-iframe .btn-back-dash{display:flex!important;}
 
+  /* Compact nav strip — iframe mode only */
+  .iframe-nav{
+    display:none;align-items:center;gap:4px;padding:8px 14px;
+    background:#fff;border-bottom:1px solid var(--border);
+    overflow-x:auto;flex-shrink:0;
+  }
+  body.in-iframe .iframe-nav{display:flex;}
+  .inb{
+    display:flex;align-items:center;gap:5px;padding:5px 11px;
+    border:1.5px solid var(--border);border-radius:6px;
+    background:var(--bg);font-family:'Montserrat',sans-serif;
+    font-size:11px;font-weight:600;color:var(--dark);
+    cursor:pointer;white-space:nowrap;transition:all .15s;
+  }
+  .inb:hover{background:#ebebeb;border-color:#bbb;}
+  .inb-active{background:var(--dark)!important;color:#fff!important;border-color:var(--dark)!important;}
+  .inb-sep{width:1px;height:18px;background:var(--border);margin:0 4px;flex-shrink:0;}
+
   @media(max-width:900px){
     .delivery-grid{grid-template-columns:repeat(2,1fr);}
   }
@@ -402,6 +420,28 @@
     </div>
   </div>
 
+  <!-- Quick nav strip: only visible in iframe mode -->
+  <div class="iframe-nav" id="iframeNav">
+    <button class="inb" onclick="sdGoTo('dashboard')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </button>
+    <div class="inb-sep"></div>
+    <button class="inb" onclick="sdGoTo('danger')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 19h20L12 2z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+      Danger Zone
+    </button>
+    <button class="inb" onclick="sdGoTo('cleanup')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+      Cleanup Log
+    </button>
+    <div class="inb-sep"></div>
+    <button class="inb" onclick="sdGoTo('folder','_ACTIVE')">_ACTIVE</button>
+    <button class="inb" onclick="sdGoTo('folder','_ARCHIVE')">_ARCHIVE</button>
+    <button class="inb" onclick="sdGoTo('folder','_INBOX')">_INBOX</button>
+    <button class="inb" onclick="sdGoTo('folder','_PERSONAL')">_PERSONAL</button>
+  </div>
+
   <!-- RECORDS DRAWER -->
   <div class="records-drawer" id="recordsDrawer">
     <div class="drawer-header">
@@ -553,6 +593,7 @@ window.sdGoBack = function() {
 };
 window.sdGoTo = function(view, folder) {
   if (window.self !== window.top) {
+    // Inside dashboard iframe — tell parent to navigate
     try {
       if (view === 'dashboard') { window.parent.closeShootDay(); return; }
       if (typeof window.parent.goToView === 'function') {
@@ -562,6 +603,10 @@ window.sdGoTo = function(view, folder) {
       }
     } catch(e) { window.top.location.href = 'dashboard.html'; }
   } else {
+    // Standalone mode — save destination, redirect to dashboard
+    if (view && view !== 'dashboard') {
+      sessionStorage.setItem('sd_goto', JSON.stringify({ view: view, folder: folder || null }));
+    }
     window.location.href = 'dashboard.html';
   }
 };

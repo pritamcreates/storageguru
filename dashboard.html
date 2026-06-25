@@ -695,6 +695,24 @@ onAuthStateChanged(auth, async user => {
   }
 
   await refreshAll();
+
+  // Navigate to view requested from shoot day standalone sidebar
+  const sdGoto = sessionStorage.getItem('sd_goto');
+  if (sdGoto) {
+    sessionStorage.removeItem('sd_goto');
+    try {
+      const { view, folder } = JSON.parse(sdGoto);
+      setTimeout(() => {
+        if (folder) {
+          const navEl = document.querySelector(`.nav-item[data-folder="${folder}"]`);
+          setFolder(navEl || null, folder);
+        } else if (view) {
+          const navEl = document.querySelector(`.nav-item[data-view="${view}"]`);
+          if (navEl) setView(navEl, view);
+        }
+      }, 400);
+    } catch(e) {}
+  }
 });
 
 async function refreshAll() {
@@ -706,6 +724,7 @@ async function refreshAll() {
   renderLogs();
   renderTodayCard();
 }
+window.refreshAll = refreshAll; // expose so closeShootDay can call it
 
 // ── LOAD ──
 async function loadDrives() {
@@ -1383,6 +1402,8 @@ window.closeShootDay = function() {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const dashBtn = document.querySelector('.nav-item[data-view="all"]');
   if (dashBtn) dashBtn.classList.add('active');
+  // Refresh drives so any shoot-day-synced drives appear immediately
+  if (typeof refreshAll === 'function') refreshAll();
 };
 
 // Called from shootday iframe to navigate dashboard
