@@ -297,6 +297,355 @@
   /* Stat card hover */
   .stat-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;}
   .stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06);}
+
+  /* ═══════════════════════════════════════════
+     FILE RECORDS PANEL
+  ════════════════════════════════════════════ */
+  .file-records-overlay{
+    position:fixed;
+    inset:0 0 0 var(--sidebar-w);
+    z-index:300;
+    background:var(--bg);
+    display:none;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .file-records-overlay.open{display:flex;}
+
+  /* ── TOPBAR ── */
+  .fr-topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 28px;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+    gap:14px;
+  }
+  .fr-topbar-left{display:flex;align-items:center;gap:14px;min-width:0;}
+  .fr-title-block h2{font-size:18px;font-weight:800;letter-spacing:-.4px;color:var(--dark);line-height:1.1;}
+  .fr-title-block p{font-size:11px;color:var(--gray);margin-top:2px;}
+  .fr-badge{
+    display:inline-flex;align-items:center;gap:5px;
+    background:var(--bg);border:1px solid var(--border);
+    border-radius:20px;padding:4px 10px;
+    font-size:10px;font-weight:700;color:var(--gray);letter-spacing:.5px;
+    white-space:nowrap;
+  }
+  .fr-topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+
+  .fr-search-box{
+    display:flex;align-items:center;gap:8px;
+    background:var(--bg);border:1.5px solid var(--border);
+    border-radius:9px;padding:8px 14px;
+    width:260px;transition:border-color .2s;
+  }
+  .fr-search-box:focus-within{border-color:#999;}
+  .fr-search-box input{
+    background:none;border:none;outline:none;
+    font-family:'Montserrat',sans-serif;
+    font-size:12px;color:var(--dark);width:100%;
+  }
+  .fr-search-box input::placeholder{color:#bbb;}
+
+  .btn-fr-add{
+    display:flex;align-items:center;gap:7px;
+    padding:9px 16px;
+    background:var(--dark);color:#fff;
+    border:none;border-radius:8px;
+    font-family:'Montserrat',sans-serif;
+    font-size:12px;font-weight:700;
+    cursor:pointer;transition:background .2s,transform .1s;
+    white-space:nowrap;
+  }
+  .btn-fr-add:hover{background:#2a2a2a;transform:translateY(-1px);}
+
+  .btn-fr-close{
+    display:flex;align-items:center;justify-content:center;
+    width:36px;height:36px;
+    background:var(--bg);border:1.5px solid var(--border);
+    border-radius:8px;cursor:pointer;
+    color:var(--gray);transition:all .15s;
+    flex-shrink:0;
+  }
+  .btn-fr-close:hover{background:#e8e8e8;color:var(--dark);}
+
+  /* ── FILTER BAR ── */
+  .fr-filterbar{
+    display:flex;align-items:center;gap:10px;
+    padding:12px 28px;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+    flex-wrap:wrap;
+  }
+  .fr-filter-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#aaa;flex-shrink:0;}
+  .fr-filter-group{display:flex;gap:5px;flex-wrap:wrap;}
+  .fr-filter-btn{
+    padding:5px 12px;border-radius:6px;
+    font-size:11px;font-weight:600;
+    cursor:pointer;
+    border:1.5px solid var(--border);
+    background:#fff;color:var(--gray);
+    transition:all .15s;
+    font-family:'Montserrat',sans-serif;
+    white-space:nowrap;
+  }
+  .fr-filter-btn.active{background:var(--dark);color:#fff;border-color:var(--dark);}
+  .fr-filter-btn:hover:not(.active){border-color:#bbb;color:var(--dark);}
+  .fr-drive-select{
+    padding:5px 10px;border-radius:6px;
+    font-size:11px;font-weight:600;
+    border:1.5px solid var(--border);
+    background:#fff;color:var(--gray);
+    font-family:'Montserrat',sans-serif;
+    outline:none;cursor:pointer;
+    transition:border-color .2s;
+    max-width:200px;
+  }
+  .fr-drive-select:focus{border-color:#999;}
+  .fr-filter-divider{width:1px;height:18px;background:var(--border);flex-shrink:0;}
+
+  /* ── STATS STRIP ── */
+  .fr-stats-strip{
+    display:flex;gap:0;
+    padding:0 28px;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .fr-stat-item{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 20px 10px 0;
+    margin-right:20px;
+    border-right:1px solid var(--border);
+  }
+  .fr-stat-item:last-child{border-right:none;}
+  .fr-stat-icon{
+    width:28px;height:28px;
+    border-radius:7px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    font-size:13px;
+  }
+  .fr-stat-val{font-size:16px;font-weight:800;color:var(--dark);line-height:1;}
+  .fr-stat-lbl{font-size:10px;color:var(--gray);margin-top:1px;}
+
+  /* ── CONTENT AREA ── */
+  .fr-content{
+    flex:1;overflow-y:auto;
+    padding:20px 28px;
+    display:flex;flex-direction:column;gap:14px;
+  }
+
+  /* ── FILE RECORD CARD ── */
+  .fr-card{
+    background:#fff;
+    border:1.5px solid var(--border);
+    border-radius:13px;
+    padding:16px 18px;
+    display:flex;align-items:flex-start;gap:14px;
+    cursor:default;
+    transition:transform .15s,box-shadow .15s,border-color .15s;
+    position:relative;
+    animation:fadeUp .3s ease both;
+  }
+  .fr-card:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.06);border-color:#ccc;}
+  .fr-card-icon{
+    width:40px;height:40px;
+    border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    font-size:18px;
+  }
+  .fr-card-body{flex:1;min-width:0;}
+  .fr-card-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;}
+  .fr-file-name{
+    font-size:13px;font-weight:700;color:var(--dark);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    max-width:320px;
+  }
+  .fr-chip{
+    font-size:9px;font-weight:700;letter-spacing:.6px;
+    text-transform:uppercase;padding:2px 7px;
+    border-radius:4px;white-space:nowrap;
+  }
+  .fr-chip-drive{background:#f0f0ee;color:#555;}
+  .fr-chip-cat{background:#e8f0fe;color:#1a56db;}
+  .fr-chip-status-managed{background:#dcfce7;color:#15803d;}
+  .fr-chip-status-raw{background:#fef9c3;color:#a16207;}
+  .fr-chip-status-backed-up{background:#e0f2fe;color:#0369a1;}
+  .fr-chip-status-needs-cleanup{background:#fee2e2;color:#dc2626;}
+  .fr-chip-status-archived{background:#f3e8ff;color:#7c3aed;}
+  .fr-card-meta{
+    display:flex;align-items:center;gap:14px;
+    font-size:11px;color:var(--gray);
+    flex-wrap:wrap;
+    margin-top:3px;
+  }
+  .fr-meta-item{display:flex;align-items:center;gap:4px;}
+  .fr-card-notes{
+    font-size:11px;color:#999;
+    margin-top:5px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    max-width:600px;
+  }
+  .fr-card-actions{
+    display:flex;align-items:center;gap:6px;
+    flex-shrink:0;
+    opacity:0;
+    transition:opacity .2s;
+  }
+  .fr-card:hover .fr-card-actions{opacity:1;}
+  .fr-action-btn{
+    width:30px;height:30px;
+    border-radius:7px;
+    border:1.5px solid var(--border);
+    background:#fff;color:var(--gray);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:all .15s;
+  }
+  .fr-action-btn:hover{background:var(--bg);color:var(--dark);border-color:#bbb;}
+  .fr-action-btn.danger:hover{background:#fef2f2;color:#dc2626;border-color:#fca5a5;}
+
+  /* ── EMPTY STATE ── */
+  .fr-empty{
+    flex:1;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    padding:60px 20px;
+    text-align:center;
+  }
+  .fr-empty-icon{
+    width:64px;height:64px;
+    background:#f5f5f5;
+    border-radius:16px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:28px;
+    margin:0 auto 16px;
+  }
+  .fr-empty h3{font-size:15px;font-weight:700;color:var(--dark);margin-bottom:6px;}
+  .fr-empty p{font-size:12px;color:var(--gray);line-height:1.6;max-width:300px;}
+  .fr-empty-btn{
+    margin-top:18px;
+    display:inline-flex;align-items:center;gap:7px;
+    padding:10px 20px;
+    background:var(--dark);color:#fff;
+    border:none;border-radius:8px;
+    font-family:'Montserrat',sans-serif;
+    font-size:12px;font-weight:700;
+    cursor:pointer;transition:background .2s;
+  }
+  .fr-empty-btn:hover{background:#2a2a2a;}
+
+  /* ── ADD / EDIT FILE MODAL ── */
+  .fr-modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.5);
+    backdrop-filter:blur(5px);
+    z-index:800;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;
+    transition:opacity .2s;
+  }
+  .fr-modal-overlay.open{opacity:1;pointer-events:all;}
+  .fr-modal{
+    background:#fff;
+    border-radius:18px;
+    padding:28px;
+    width:500px;max-width:94vw;
+    box-shadow:0 24px 64px rgba(0,0,0,.22);
+    transform:translateY(14px);
+    transition:transform .25s;
+    max-height:90vh;
+    overflow-y:auto;
+  }
+  .fr-modal-overlay.open .fr-modal{transform:translateY(0);}
+  .fr-modal-title{font-size:19px;font-weight:800;color:var(--dark);margin-bottom:4px;}
+  .fr-modal-sub{font-size:12px;color:var(--gray);margin-bottom:22px;line-height:1.5;}
+  .fr-modal-field{margin-bottom:14px;}
+  .fr-modal-field label{
+    display:block;font-size:10px;font-weight:700;
+    letter-spacing:.6px;text-transform:uppercase;
+    color:var(--gray);margin-bottom:6px;
+  }
+  .fr-modal-field input,
+  .fr-modal-field select,
+  .fr-modal-field textarea{
+    width:100%;padding:10px 13px;
+    border:1.5px solid var(--border);
+    border-radius:9px;
+    font-family:'Montserrat',sans-serif;
+    font-size:13px;color:var(--dark);
+    background:var(--bg);outline:none;
+    transition:border-color .2s;
+  }
+  .fr-modal-field input:focus,
+  .fr-modal-field select:focus,
+  .fr-modal-field textarea:focus{border-color:#999;background:#fff;}
+  .fr-modal-field textarea{resize:vertical;min-height:68px;}
+  .fr-modal-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .fr-modal-actions{display:flex;gap:10px;margin-top:20px;}
+  .fr-btn-primary{
+    flex:1;padding:12px;
+    background:var(--dark);color:#fff;
+    border:none;border-radius:9px;
+    font-family:'Montserrat',sans-serif;
+    font-size:13px;font-weight:700;
+    cursor:pointer;transition:background .2s;
+  }
+  .fr-btn-primary:hover{background:#1e1e1e;}
+  .fr-btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+  .fr-btn-cancel{
+    padding:12px 16px;
+    background:var(--bg);color:var(--gray);
+    border:1.5px solid var(--border);
+    border-radius:9px;
+    font-family:'Montserrat',sans-serif;
+    font-size:13px;cursor:pointer;
+    transition:all .2s;
+  }
+  .fr-btn-cancel:hover{border-color:#bbb;color:var(--dark);}
+
+  /* ── STATUS BADGE COLORS IN MODAL ── */
+  .status-dot{
+    width:7px;height:7px;
+    border-radius:50%;flex-shrink:0;
+    display:inline-block;margin-right:5px;
+  }
+  .dot-managed{background:#22c55e;}
+  .dot-raw{background:#eab308;}
+  .dot-backed-up{background:#3b82f6;}
+  .dot-needs-cleanup{background:#ef4444;}
+  .dot-archived{background:#a855f7;}
+
+  /* ── SORT/VIEW ROW ── */
+  .fr-view-row{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:4px;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .fr-result-count{font-size:11px;color:var(--gray);}
+  .fr-sort-select{
+    padding:5px 10px;
+    border-radius:6px;
+    font-size:11px;font-weight:600;
+    border:1.5px solid var(--border);
+    background:#fff;color:var(--gray);
+    font-family:'Montserrat',sans-serif;
+    outline:none;cursor:pointer;
+  }
+
+  /* ── MOBILE ── */
+  @media(max-width:768px){
+    .file-records-overlay{inset:0;}
+    .fr-topbar{padding:12px 16px;flex-wrap:wrap;}
+    .fr-filterbar{padding:10px 16px;}
+    .fr-stats-strip{padding:0 16px;overflow-x:auto;}
+    .fr-content{padding:14px 16px;}
+    .fr-search-box{width:100%;}
+    .fr-modal-row{grid-template-columns:1fr;}
+  }
 </style>
 </head>
 <body>
@@ -343,6 +692,11 @@
     <button class="nav-item" id="navShootDay" onclick="openShootDay(this)">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M6.3 6.3A8 8 0 1 0 17.7 17.7"/><path d="M2 12h2M20 12h2M12 2v2M12 20v2"/></svg>
       Shoot Day
+    </button>
+    <button class="nav-item" id="navFileRecords" onclick="openFileRecords(this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      File Records
+      <span id="frNavBadge" style="margin-left:auto;background:#111;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;display:none;">0</span>
     </button>
 
     <div class="nav-label">Folders</div>
@@ -643,6 +997,272 @@
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<!-- ═══════════════════════════════════════════
+     FILE RECORDS PANEL
+════════════════════════════════════════════ -->
+<div class="file-records-overlay" id="fileRecordsOverlay">
+
+  <!-- TOPBAR -->
+  <div class="fr-topbar">
+    <div class="fr-topbar-left">
+      <div class="fr-title-block">
+        <h2>File Records</h2>
+        <p>Track every file & project across all your drives</p>
+      </div>
+      <span class="fr-badge" id="frTotalBadge">0 files</span>
+    </div>
+    <div class="fr-topbar-right">
+      <div class="fr-search-box">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="frSearchInput" placeholder="Search files, drives, tags…" oninput="frOnSearch(this.value)"/>
+      </div>
+      <button class="btn-fr-add" onclick="openFrAddModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add File Record
+      </button>
+      <button class="btn-fr-close" onclick="closeFileRecords()" title="Close File Records">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- STATS STRIP -->
+  <div class="fr-stats-strip">
+    <div class="fr-stat-item">
+      <div class="fr-stat-icon" style="background:#f0fdf4;">📁</div>
+      <div><div class="fr-stat-val" id="frStManaged">0</div><div class="fr-stat-lbl">Managed</div></div>
+    </div>
+    <div class="fr-stat-item">
+      <div class="fr-stat-icon" style="background:#fef9c3;">🎬</div>
+      <div><div class="fr-stat-val" id="frStRaw">0</div><div class="fr-stat-lbl">Raw</div></div>
+    </div>
+    <div class="fr-stat-item">
+      <div class="fr-stat-icon" style="background:#eff6ff;">☁️</div>
+      <div><div class="fr-stat-val" id="frStBacked">0</div><div class="fr-stat-lbl">Backed Up</div></div>
+    </div>
+    <div class="fr-stat-item">
+      <div class="fr-stat-icon" style="background:#fef2f2;">🧹</div>
+      <div><div class="fr-stat-val" id="frStCleanup">0</div><div class="fr-stat-lbl">Needs Cleanup</div></div>
+    </div>
+    <div class="fr-stat-item">
+      <div class="fr-stat-icon" style="background:#f5f3ff;">📦</div>
+      <div><div class="fr-stat-val" id="frStArchived">0</div><div class="fr-stat-lbl">Archived</div></div>
+    </div>
+    <div class="fr-stat-item" style="margin-left:auto;border-right:none;">
+      <div><div class="fr-stat-val" id="frStTotalSize">0 GB</div><div class="fr-stat-lbl">Total Size</div></div>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="fr-filterbar">
+    <span class="fr-filter-label">Status</span>
+    <div class="fr-filter-group" id="frStatusFilters">
+      <button class="fr-filter-btn active" data-status="all" onclick="frSetStatus(this,'all')">All</button>
+      <button class="fr-filter-btn" data-status="managed" onclick="frSetStatus(this,'managed')">✅ Managed</button>
+      <button class="fr-filter-btn" data-status="raw" onclick="frSetStatus(this,'raw')">🎬 Raw</button>
+      <button class="fr-filter-btn" data-status="backed-up" onclick="frSetStatus(this,'backed-up')">☁️ Backed Up</button>
+      <button class="fr-filter-btn" data-status="needs-cleanup" onclick="frSetStatus(this,'needs-cleanup')">🧹 Needs Cleanup</button>
+      <button class="fr-filter-btn" data-status="archived" onclick="frSetStatus(this,'archived')">📦 Archived</button>
+    </div>
+    <div class="fr-filter-divider"></div>
+    <span class="fr-filter-label">Drive</span>
+    <select class="fr-drive-select" id="frDriveFilter" onchange="frSetDrive(this.value)">
+      <option value="all">All Drives</option>
+    </select>
+    <div class="fr-filter-divider"></div>
+    <span class="fr-filter-label">Category</span>
+    <div class="fr-filter-group" id="frCatFilters">
+      <button class="fr-filter-btn active" data-cat="all" onclick="frSetCat(this,'all')">All</button>
+      <button class="fr-filter-btn" data-cat="Video" onclick="frSetCat(this,'Video')">Video</button>
+      <button class="fr-filter-btn" data-cat="Photo" onclick="frSetCat(this,'Photo')">Photo</button>
+      <button class="fr-filter-btn" data-cat="Audio" onclick="frSetCat(this,'Audio')">Audio</button>
+      <button class="fr-filter-btn" data-cat="Project" onclick="frSetCat(this,'Project')">Project</button>
+      <button class="fr-filter-btn" data-cat="Backup" onclick="frSetCat(this,'Backup')">Backup</button>
+      <button class="fr-filter-btn" data-cat="Other" onclick="frSetCat(this,'Other')">Other</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="fr-content" id="frContent">
+    <div class="fr-view-row">
+      <span class="fr-result-count" id="frResultCount">Loading…</span>
+      <select class="fr-sort-select" id="frSortSelect" onchange="frRenderRecords()">
+        <option value="date-desc">Newest first</option>
+        <option value="date-asc">Oldest first</option>
+        <option value="name-asc">Name A–Z</option>
+        <option value="name-desc">Name Z–A</option>
+        <option value="size-desc">Largest first</option>
+        <option value="size-asc">Smallest first</option>
+      </select>
+    </div>
+    <div id="frCardsList"></div>
+  </div>
+</div>
+
+<!-- ── ADD / EDIT FILE RECORD MODAL ── -->
+<div class="fr-modal-overlay" id="frModal">
+  <div class="fr-modal">
+    <div class="fr-modal-title" id="frModalTitle">Add File Record</div>
+    <div class="fr-modal-sub" id="frModalSub">Log a file or project stored on one of your drives</div>
+
+    <div class="fr-modal-field">
+      <label>File / Project Name *</label>
+      <input type="text" id="frfName" placeholder="e.g. Wedding_Film_4K_Master, RAW_Footage_Day1" maxlength="120"/>
+    </div>
+
+    <div class="fr-modal-row">
+      <div class="fr-modal-field">
+        <label>Drive *</label>
+        <select id="frfDrive"></select>
+      </div>
+      <div class="fr-modal-field">
+        <label>Category</label>
+        <select id="frfCat">
+          <option value="Video">🎬 Video</option>
+          <option value="Photo">📷 Photo</option>
+          <option value="Audio">🎵 Audio</option>
+          <option value="Project">💼 Project</option>
+          <option value="Backup">🛡️ Backup</option>
+          <option value="Other">📄 Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="fr-modal-row">
+      <div class="fr-modal-field">
+        <label>File Size (GB)</label>
+        <input type="number" id="frfSize" placeholder="e.g. 120" min="0" step="0.01"/>
+      </div>
+      <div class="fr-modal-field">
+        <label>Status</label>
+        <select id="frfStatus">
+          <option value="raw">🎬 Raw — Unprocessed</option>
+          <option value="managed">✅ Managed — Organized</option>
+          <option value="backed-up">☁️ Backed Up — Safe</option>
+          <option value="needs-cleanup">🧹 Needs Cleanup</option>
+          <option value="archived">📦 Archived — Done</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="fr-modal-row">
+      <div class="fr-modal-field">
+        <label>Shoot Day / Project Date</label>
+        <input type="date" id="frfDate"/>
+      </div>
+      <div class="fr-modal-field">
+        <label>Folder / Path on Drive</label>
+        <input type="text" id="frfPath" placeholder="e.g. /Projects/2024/Client_X"/>
+      </div>
+    </div>
+
+    <div class="fr-modal-field">
+      <label>Tags (comma separated)</label>
+      <input type="text" id="frfTags" placeholder="e.g. client-work, 4K, wedding, delivered"/>
+    </div>
+
+    <div class="fr-modal-field">
+      <label>Notes</label>
+      <textarea id="frfNotes" placeholder="Any extra details — codec, client name, delivery status…"></textarea>
+    </div>
+
+    <div class="fr-modal-actions">
+      <button class="fr-btn-cancel" onclick="closeFrModal()">Cancel</button>
+      <button class="fr-btn-primary" id="frSaveBtn" onclick="saveFrRecord()">Save Record</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── FILE RECORD DETAIL / EDIT MODAL ── -->
+<div class="fr-modal-overlay" id="frEditModal">
+  <div class="fr-modal">
+    <div class="fr-modal-title">Edit File Record</div>
+    <div class="fr-modal-sub" id="frEditSub">Update the details for this file</div>
+
+    <div class="fr-modal-field">
+      <label>File / Project Name *</label>
+      <input type="text" id="freName" maxlength="120"/>
+    </div>
+
+    <div class="fr-modal-row">
+      <div class="fr-modal-field">
+        <label>Drive *</label>
+        <select id="freDrive"></select>
+      </div>
+      <div class="fr-modal-field">
+        <label>Category</label>
+        <select id="freCat">
+          <option value="Video">🎬 Video</option>
+          <option value="Photo">📷 Photo</option>
+          <option value="Audio">🎵 Audio</option>
+          <option value="Project">💼 Project</option>
+          <option value="Backup">🛡️ Backup</option>
+          <option value="Other">📄 Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="fr-modal-row">
+      <div class="fr-modal-field">
+        <label>File Size (GB)</label>
+        <input type="number" id="freSize" min="0" step="0.01"/>
+      </div>
+      <div class="fr-modal-field">
+        <label>Status</label>
+        <select id="freStatus">
+          <option value="raw">🎬 Raw — Unprocessed</option>
+          <option value="managed">✅ Managed — Organized</option>
+          <option value="backed-up">☁️ Backed Up — Safe</option>
+          <option value="needs-cleanup">🧹 Needs Cleanup</option>
+          <option value="archived">📦 Archived — Done</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="fr-modal-row">
+      <div class="fr-modal-field">
+        <label>Shoot Day / Project Date</label>
+        <input type="date" id="freDate"/>
+      </div>
+      <div class="fr-modal-field">
+        <label>Folder / Path on Drive</label>
+        <input type="text" id="frePath"/>
+      </div>
+    </div>
+
+    <div class="fr-modal-field">
+      <label>Tags (comma separated)</label>
+      <input type="text" id="freTags"/>
+    </div>
+
+    <div class="fr-modal-field">
+      <label>Notes</label>
+      <textarea id="freNotes"></textarea>
+    </div>
+
+    <div class="fr-modal-actions">
+      <button class="fr-btn-cancel" onclick="closeFrEditModal()">Cancel</button>
+      <button class="fr-btn-primary" id="frEditSaveBtn" onclick="saveEditFrRecord()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── FILE RECORD DELETE CONFIRM ── -->
+<div class="delete-overlay" id="frDeleteOverlay">
+  <div class="delete-backdrop" onclick="cancelFrDelete()"></div>
+  <div class="delete-dialog">
+    <div class="delete-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+    </div>
+    <h3 id="frDeleteTitle">Delete file record?</h3>
+    <p id="frDeleteMsg">This cannot be undone.</p>
+    <div class="delete-btns">
+      <button class="btn-del-cancel" onclick="cancelFrDelete()">Cancel</button>
+      <button class="btn-del-confirm" id="frDeleteConfirmBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -723,8 +1343,11 @@ async function refreshAll() {
   renderDrives();
   renderLogs();
   renderTodayCard();
+  // Sync drives list to File Records module
+  if (typeof window._frSyncDrives === 'function') window._frSyncDrives(allDrives);
 }
 window.refreshAll = refreshAll; // expose so closeShootDay can call it
+window.allDrives = allDrives;   // expose for File Records panel
 
 // ── LOAD ──
 async function loadDrives() {
@@ -1380,6 +2003,509 @@ window.closeSidebar = function() {
   document.getElementById('mainSidebar').classList.remove('mobile-open');
   document.getElementById('sidebarOverlay').style.display = 'none';
 };
+</script>
+
+<!-- ═══════════════════════════════════════════
+     FILE RECORDS — FIREBASE MODULE
+════════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, addDoc, getDocs, updateDoc, deleteDoc,
+  query, where, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDB7hnzaSPQt7EBAku-Xs-qXwni6WXBFCY",
+  authDomain: "storage-guru.firebaseapp.com",
+  projectId: "storage-guru",
+  storageBucket: "storage-guru.firebasestorage.app",
+  messagingSenderId: "453609358796",
+  appId: "1:453609358796:web:cac761b6a4b491fc4c8969"
+};
+
+const _frApp  = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+const _frAuth = getAuth(_frApp);
+const _frDb   = getFirestore(_frApp);
+
+// ── STATE ──────────────────────────────────────
+let _frUser      = null;
+let _allRecords  = [];   // full unfiltered list
+let _frStatusF   = 'all';
+let _frDriveF    = 'all';
+let _frCatF      = 'all';
+let _frSearchQ   = '';
+let _editRecordId = null;
+let _pendingFrDeleteId = null;
+
+// ── CAT ICONS ──────────────────────────────────
+const CAT_ICON = {
+  Video:   { icon:'🎬', bg:'#fff7ed' },
+  Photo:   { icon:'📷', bg:'#f0fdf4' },
+  Audio:   { icon:'🎵', bg:'#f5f3ff' },
+  Project: { icon:'💼', bg:'#eff6ff' },
+  Backup:  { icon:'🛡️', bg:'#fafafa' },
+  Other:   { icon:'📄', bg:'#f9fafb' },
+};
+
+const STATUS_LABEL = {
+  managed:       '✅ Managed',
+  raw:           '🎬 Raw',
+  'backed-up':   '☁️ Backed Up',
+  'needs-cleanup':'🧹 Needs Cleanup',
+  archived:      '📦 Archived',
+};
+
+// ── AUTH LISTENER ──────────────────────────────
+onAuthStateChanged(_frAuth, async user => {
+  _frUser = user;
+  if (user) {
+    await _frLoadRecords();
+    _frUpdateDriveFilter();
+    _frUpdateStats();
+    _frRenderNav();
+  }
+});
+
+// ── LOAD ───────────────────────────────────────
+async function _frLoadRecords() {
+  if (!_frUser) return;
+  try {
+    const snap = await getDocs(query(
+      collection(_frDb, 'fileRecords'),
+      where('uid', '==', _frUser.uid)
+    ));
+    _allRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Sort by date desc by default
+    _allRecords.sort((a, b) => {
+      const ta = a.createdAt?.toDate?.()?.getTime() ?? 0;
+      const tb = b.createdAt?.toDate?.()?.getTime() ?? 0;
+      return tb - ta;
+    });
+  } catch(e) {
+    console.error('fileRecords load error', e);
+    _allRecords = [];
+  }
+}
+
+// ── FILTER + SORT ──────────────────────────────
+function _frGetFiltered() {
+  let list = [..._allRecords];
+
+  if (_frStatusF !== 'all') list = list.filter(r => r.status === _frStatusF);
+  if (_frDriveF  !== 'all') list = list.filter(r => r.driveId === _frDriveF);
+  if (_frCatF    !== 'all') list = list.filter(r => r.category === _frCatF);
+
+  if (_frSearchQ) {
+    const q = _frSearchQ.toLowerCase();
+    list = list.filter(r =>
+      (r.name||'').toLowerCase().includes(q) ||
+      (r.driveName||'').toLowerCase().includes(q) ||
+      (r.category||'').toLowerCase().includes(q) ||
+      (r.tags||'').toLowerCase().includes(q) ||
+      (r.notes||'').toLowerCase().includes(q) ||
+      (r.path||'').toLowerCase().includes(q)
+    );
+  }
+
+  // Apply sort
+  const sort = document.getElementById('frSortSelect')?.value || 'date-desc';
+  list.sort((a, b) => {
+    if (sort === 'date-desc') {
+      const ta = a.createdAt?.toDate?.()?.getTime() ?? 0;
+      const tb = b.createdAt?.toDate?.()?.getTime() ?? 0;
+      return tb - ta;
+    }
+    if (sort === 'date-asc') {
+      const ta = a.createdAt?.toDate?.()?.getTime() ?? 0;
+      const tb = b.createdAt?.toDate?.()?.getTime() ?? 0;
+      return ta - tb;
+    }
+    if (sort === 'name-asc')  return (a.name||'').localeCompare(b.name||'');
+    if (sort === 'name-desc') return (b.name||'').localeCompare(a.name||'');
+    if (sort === 'size-desc') return (Number(b.size)||0) - (Number(a.size)||0);
+    if (sort === 'size-asc')  return (Number(a.size)||0) - (Number(b.size)||0);
+    return 0;
+  });
+
+  return list;
+}
+
+// ── RENDER ─────────────────────────────────────
+window.frRenderRecords = function() {
+  const list  = _frGetFiltered();
+  const wrap  = document.getElementById('frCardsList');
+  const count = document.getElementById('frResultCount');
+  if (!wrap) return;
+
+  count.textContent = `${list.length} record${list.length !== 1 ? 's' : ''}${_frSearchQ ? ' found' : ''}`;
+
+  if (list.length === 0) {
+    const isNoData = _allRecords.length === 0;
+    wrap.innerHTML = `<div class="fr-empty">
+      <div class="fr-empty-icon">${isNoData ? '📁' : '🔍'}</div>
+      <h3>${isNoData ? 'No file records yet' : 'No records match your filters'}</h3>
+      <p>${isNoData
+        ? 'Start by logging files, projects, or footage stored on each of your drives — so you always know where everything lives.'
+        : 'Try clearing the search or changing the filters above.'}
+      </p>
+      ${isNoData ? '<button class="fr-empty-btn" onclick="openFrAddModal()">+ Add Your First File Record</button>' : ''}
+    </div>`;
+    return;
+  }
+
+  // Highlight helper
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const hi  = (text, q) => {
+    if (!q) return esc(text);
+    const safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return esc(text).replace(new RegExp(safe,'gi'), m => `<mark class="sh">${m}</mark>`);
+  };
+
+  wrap.innerHTML = list.map(r => {
+    const ci = CAT_ICON[r.category] || CAT_ICON.Other;
+    const dateStr = r.shootDate
+      ? new Date(r.shootDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
+      : (r.createdAt?.toDate ? r.createdAt.toDate().toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '—');
+    const sizeStr = r.size > 0 ? `${parseFloat(Number(r.size).toFixed(2))} GB` : '—';
+    const tags = (r.tags||'').split(',').map(t=>t.trim()).filter(Boolean);
+    const tagHtml = tags.slice(0,4).map(t =>
+      `<span class="fr-chip fr-chip-cat">${esc(t)}</span>`
+    ).join('');
+
+    return `<div class="fr-card" id="frcard-${r.id}">
+      <div class="fr-card-icon" style="background:${ci.bg}">${ci.icon}</div>
+      <div class="fr-card-body">
+        <div class="fr-card-top">
+          <span class="fr-file-name" title="${esc(r.name)}">${hi(r.name, _frSearchQ)}</span>
+          <span class="fr-chip fr-chip-drive">${hi(r.driveName||'Unknown Drive', _frSearchQ)}</span>
+          <span class="fr-chip fr-chip-status-${r.status||'raw'}">${STATUS_LABEL[r.status]||r.status}</span>
+          ${tagHtml}
+        </div>
+        <div class="fr-card-meta">
+          <span class="fr-meta-item">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="3"/><circle cx="18" cy="12" r="1.5" fill="currentColor"/></svg>
+            ${esc(r.category||'Other')}
+          </span>
+          <span class="fr-meta-item">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            ${sizeStr}
+          </span>
+          <span class="fr-meta-item">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            ${dateStr}
+          </span>
+          ${r.path ? `<span class="fr-meta-item" title="${esc(r.path)}">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
+            ${esc(r.path.length > 32 ? r.path.slice(0,32)+'…' : r.path)}
+          </span>` : ''}
+        </div>
+        ${r.notes ? `<div class="fr-card-notes" title="${esc(r.notes)}">📝 ${esc(r.notes)}</div>` : ''}
+      </div>
+      <div class="fr-card-actions">
+        <button class="fr-action-btn" title="Edit record" onclick="openFrEditModal('${r.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="fr-action-btn" title="Quick status: cycle" onclick="frCycleStatus('${r.id}')" style="font-size:14px;">🔄</button>
+        <button class="fr-action-btn danger" title="Delete record" onclick="confirmFrDelete('${r.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+};
+
+// ── STATS ──────────────────────────────────────
+function _frUpdateStats() {
+  const el = id => document.getElementById(id);
+  el('frStManaged') && (el('frStManaged').textContent  = _allRecords.filter(r=>r.status==='managed').length);
+  el('frStRaw')     && (el('frStRaw').textContent      = _allRecords.filter(r=>r.status==='raw').length);
+  el('frStBacked')  && (el('frStBacked').textContent   = _allRecords.filter(r=>r.status==='backed-up').length);
+  el('frStCleanup') && (el('frStCleanup').textContent  = _allRecords.filter(r=>r.status==='needs-cleanup').length);
+  el('frStArchived')&& (el('frStArchived').textContent = _allRecords.filter(r=>r.status==='archived').length);
+  const totalGB = _allRecords.reduce((s,r)=>s+(Number(r.size)||0),0);
+  el('frStTotalSize') && (el('frStTotalSize').textContent = totalGB >= 1000
+    ? parseFloat((totalGB/1000).toFixed(2))+' TB'
+    : parseFloat(totalGB.toFixed(2))+' GB');
+  const total = _allRecords.length;
+  el('frTotalBadge') && (el('frTotalBadge').textContent = `${total} file${total!==1?'s':''}`);
+}
+
+function _frRenderNav() {
+  const badge = document.getElementById('frNavBadge');
+  if (!badge) return;
+  const n = _allRecords.length;
+  badge.textContent = n;
+  badge.style.display = n > 0 ? 'inline-block' : 'none';
+}
+
+function _frUpdateDriveFilter() {
+  const sel = document.getElementById('frDriveFilter');
+  if (!sel) return;
+  // Pull drives from the parent module's allDrives if available
+  const drives = window._frDriveList || [];
+  sel.innerHTML = '<option value="all">All Drives</option>' +
+    drives.map(d => `<option value="${d.id}">${d.name} (${d.type})</option>`).join('');
+}
+
+// ── OPEN / CLOSE PANEL ─────────────────────────
+window.openFileRecords = function(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+  // Sync drives list from main module
+  if (window.allDrives) {
+    window._frDriveList = window.allDrives;
+    _frUpdateDriveFilter();
+  }
+  frRenderRecords();
+  document.getElementById('fileRecordsOverlay').classList.add('open');
+  // Close mobile sidebar
+  if (typeof closeSidebar === 'function') closeSidebar();
+};
+
+window.closeFileRecords = function() {
+  document.getElementById('fileRecordsOverlay').classList.remove('open');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const dashBtn = document.querySelector('.nav-item[data-view="all"]');
+  if (dashBtn) dashBtn.classList.add('active');
+};
+
+// ── FILTERS ────────────────────────────────────
+window.frSetStatus = function(el, val) {
+  _frStatusF = val;
+  document.querySelectorAll('#frStatusFilters .fr-filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  frRenderRecords();
+};
+window.frSetDrive = function(val) {
+  _frDriveF = val;
+  frRenderRecords();
+};
+window.frSetCat = function(el, val) {
+  _frCatF = val;
+  document.querySelectorAll('#frCatFilters .fr-filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  frRenderRecords();
+};
+window.frOnSearch = function(q) {
+  _frSearchQ = q;
+  frRenderRecords();
+};
+
+// ── ADD MODAL ──────────────────────────────────
+window.openFrAddModal = function() {
+  if (!_frUser) return;
+  document.getElementById('frModalTitle').textContent = 'Add File Record';
+  document.getElementById('frModalSub').textContent   = 'Log a file or project stored on one of your drives';
+  document.getElementById('frSaveBtn').textContent    = 'Save Record';
+
+  // Clear form
+  ['frfName','frfSize','frfPath','frfTags','frfNotes'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('frfDate').value   = '';
+  document.getElementById('frfStatus').value = 'raw';
+  document.getElementById('frfCat').value    = 'Video';
+
+  // Populate drives
+  const drivesSel = document.getElementById('frfDrive');
+  const drives = window._frDriveList || [];
+  drivesSel.innerHTML = drives.length
+    ? drives.map(d => `<option value="${d.id}" data-name="${d.name}">${d.name} (${d.type})</option>`).join('')
+    : '<option value="">No drives registered yet</option>';
+
+  document.getElementById('frModal').classList.add('open');
+  setTimeout(() => document.getElementById('frfName')?.focus(), 100);
+};
+
+window.closeFrModal = function() {
+  document.getElementById('frModal').classList.remove('open');
+};
+
+// ── SAVE NEW RECORD ────────────────────────────
+window.saveFrRecord = async function() {
+  const btn  = document.getElementById('frSaveBtn');
+  const name = document.getElementById('frfName').value.trim();
+  const driveEl = document.getElementById('frfDrive');
+  const driveId = driveEl.value;
+  const driveName = driveEl.options[driveEl.selectedIndex]?.dataset?.name ||
+                    driveEl.options[driveEl.selectedIndex]?.text || '';
+  const category = document.getElementById('frfCat').value;
+  const size     = Number(document.getElementById('frfSize').value) || 0;
+  const status   = document.getElementById('frfStatus').value;
+  const shootDate= document.getElementById('frfDate').value;
+  const path     = document.getElementById('frfPath').value.trim();
+  const tags     = document.getElementById('frfTags').value.trim();
+  const notes    = document.getElementById('frfNotes').value.trim();
+
+  if (!name) { _frToast('Please enter a file name'); return; }
+  if (!driveId) { _frToast('Please select a drive'); return; }
+
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await addDoc(collection(_frDb,'fileRecords'), {
+      uid: _frUser.uid, name, driveId, driveName,
+      category, size, status, shootDate, path, tags, notes,
+      createdAt: serverTimestamp()
+    });
+    closeFrModal();
+    await _frLoadRecords();
+    _frUpdateStats();
+    _frRenderNav();
+    frRenderRecords();
+    _frToast('✅ File record saved!');
+  } catch(e) {
+    _frToast('Error: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Record';
+  }
+};
+
+// ── EDIT MODAL ─────────────────────────────────
+window.openFrEditModal = function(id) {
+  const r = _allRecords.find(x => x.id === id);
+  if (!r) return;
+  _editRecordId = id;
+
+  document.getElementById('frEditSub').textContent = `Editing: ${r.name}`;
+  document.getElementById('freName').value   = r.name || '';
+  document.getElementById('freSize').value   = r.size || '';
+  document.getElementById('frePath').value   = r.path || '';
+  document.getElementById('freTags').value   = r.tags || '';
+  document.getElementById('freNotes').value  = r.notes || '';
+  document.getElementById('freDate').value   = r.shootDate || '';
+  document.getElementById('freStatus').value = r.status || 'raw';
+  document.getElementById('freCat').value    = r.category || 'Video';
+
+  // Populate drives
+  const drivesSel = document.getElementById('freDrive');
+  const drives = window._frDriveList || [];
+  drivesSel.innerHTML = drives.length
+    ? drives.map(d => `<option value="${d.id}" data-name="${d.name}" ${d.id===r.driveId?'selected':''}>${d.name} (${d.type})</option>`).join('')
+    : '<option value="">No drives registered</option>';
+
+  document.getElementById('frEditModal').classList.add('open');
+  setTimeout(() => document.getElementById('freName')?.focus(), 100);
+};
+
+window.closeFrEditModal = function() {
+  document.getElementById('frEditModal').classList.remove('open');
+  _editRecordId = null;
+};
+
+window.saveEditFrRecord = async function() {
+  if (!_editRecordId) return;
+  const btn = document.getElementById('frEditSaveBtn');
+  const name = document.getElementById('freName').value.trim();
+  const driveEl = document.getElementById('freDrive');
+  const driveId   = driveEl.value;
+  const driveName = driveEl.options[driveEl.selectedIndex]?.dataset?.name ||
+                    driveEl.options[driveEl.selectedIndex]?.text || '';
+  const category = document.getElementById('freCat').value;
+  const size     = Number(document.getElementById('freSize').value) || 0;
+  const status   = document.getElementById('freStatus').value;
+  const shootDate= document.getElementById('freDate').value;
+  const path     = document.getElementById('frePath').value.trim();
+  const tags     = document.getElementById('freTags').value.trim();
+  const notes    = document.getElementById('freNotes').value.trim();
+
+  if (!name) { _frToast('Please enter a file name'); return; }
+  if (!driveId) { _frToast('Please select a drive'); return; }
+
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await updateDoc(doc(_frDb,'fileRecords',_editRecordId), {
+      name, driveId, driveName, category, size, status, shootDate, path, tags, notes
+    });
+    closeFrEditModal();
+    await _frLoadRecords();
+    _frUpdateStats();
+    _frRenderNav();
+    frRenderRecords();
+    _frToast('✅ Record updated');
+  } catch(e) {
+    _frToast('Error: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Changes';
+  }
+};
+
+// ── QUICK CYCLE STATUS ─────────────────────────
+window.frCycleStatus = async function(id) {
+  const r = _allRecords.find(x => x.id === id);
+  if (!r) return;
+  const cycle = ['raw','managed','backed-up','needs-cleanup','archived'];
+  const idx = cycle.indexOf(r.status);
+  const next = cycle[(idx + 1) % cycle.length];
+  try {
+    await updateDoc(doc(_frDb,'fileRecords',id), { status: next });
+    r.status = next;
+    _frUpdateStats();
+    frRenderRecords();
+    _frToast(`Status → ${STATUS_LABEL[next]}`);
+  } catch(e) { _frToast('Error: '+e.message); }
+};
+
+// ── DELETE ─────────────────────────────────────
+window.confirmFrDelete = function(id) {
+  const r = _allRecords.find(x => x.id === id);
+  if (!r) return;
+  _pendingFrDeleteId = id;
+  document.getElementById('frDeleteTitle').textContent = `Delete "${r.name}"?`;
+  document.getElementById('frDeleteMsg').textContent   = 'This file record will be permanently removed.';
+  document.getElementById('frDeleteConfirmBtn').onclick = _execFrDelete;
+  document.getElementById('frDeleteOverlay').classList.add('active');
+};
+window.cancelFrDelete = function() {
+  _pendingFrDeleteId = null;
+  document.getElementById('frDeleteOverlay').classList.remove('active');
+};
+async function _execFrDelete() {
+  if (!_pendingFrDeleteId) return;
+  const id = _pendingFrDeleteId;
+  _pendingFrDeleteId = null;
+  document.getElementById('frDeleteOverlay').classList.remove('active');
+  try {
+    await deleteDoc(doc(_frDb,'fileRecords',id));
+    await _frLoadRecords();
+    _frUpdateStats();
+    _frRenderNav();
+    frRenderRecords();
+    _frToast('🗑️ Record deleted');
+  } catch(e) { _frToast('Delete failed: '+e.message); }
+}
+
+// ── OVERLAY CLICK TO CLOSE ─────────────────────
+document.addEventListener('click', e => {
+  if (e.target === document.getElementById('frModal'))       closeFrModal();
+  if (e.target === document.getElementById('frEditModal'))   closeFrEditModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeFrModal();
+    closeFrEditModal();
+  }
+});
+
+// ── TOAST (local) ──────────────────────────────
+function _frToast(msg) {
+  // reuse the main toast if available, else console
+  const t = document.getElementById('toast');
+  if (t) {
+    t.innerHTML = '<span class="toast-dot"></span>' + msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  } else { console.log(msg); }
+}
+
+// ── EXPOSE for main module allDrives sync ──────
+// Whenever main module refreshes, it should call this:
+window._frSyncDrives = function(drives) {
+  window._frDriveList = drives;
+  _frUpdateDriveFilter();
+};
+
 </script>
 <!-- SHOOT DAY OVERLAY -->
 <div class="shootday-overlay" id="shootdayOverlay">
