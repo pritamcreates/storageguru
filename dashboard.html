@@ -1343,11 +1343,11 @@ async function refreshAll() {
   renderDrives();
   renderLogs();
   renderTodayCard();
-  // Sync drives list to File Records module
+  // Keep window reference fresh so File Records panel always has current drives
+  window.allDrives = allDrives;
   if (typeof window._frSyncDrives === 'function') window._frSyncDrives(allDrives);
 }
 window.refreshAll = refreshAll; // expose so closeShootDay can call it
-window.allDrives = allDrives;   // expose for File Records panel
 
 // ── LOAD ──
 async function loadDrives() {
@@ -1858,6 +1858,8 @@ window.closeModal = function(id) { document.getElementById(id).classList.remove(
 
 // ── VIEW / FILTER ──
 window.setView = function(el, view) {
+  // Close File Records panel if open
+  document.getElementById('fileRecordsOverlay')?.classList.remove('open');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   el.classList.add('active');
   viewMode = view;
@@ -1871,6 +1873,8 @@ window.setView = function(el, view) {
 };
 
 window.setFolder = function(navEl, folder) {
+  // Close File Records panel if open
+  document.getElementById('fileRecordsOverlay')?.classList.remove('open');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   if (navEl) navEl.classList.add('active');
   folderFilter = folderFilter===folder ? null : folder;
@@ -2514,6 +2518,8 @@ window._frSyncDrives = function(drives) {
 
 <script>
 window.openShootDay = function(el) {
+  // Close File Records panel if open
+  document.getElementById('fileRecordsOverlay')?.classList.remove('open');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   el.classList.add('active');
   const frame = document.getElementById('shootdayFrame');
